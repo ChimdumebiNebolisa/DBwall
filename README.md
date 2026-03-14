@@ -52,7 +52,7 @@ Requires **Go 1.21+** and **CGO** (for the PostgreSQL parser). First build may t
 git clone https://github.com/ChimdumebiNebolisa/DBwall.git
 cd DBwall
 go mod tidy
-go build -o dbguard ./cmd/dbguard
+CGO_ENABLED=1 go build -o dbguard ./cmd/dbguard
 ```
 
 On Windows the binary will be `dbguard.exe`; use `.\dbguard.exe` in examples below if needed.
