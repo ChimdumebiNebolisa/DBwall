@@ -1,3 +1,7 @@
 # Project documentation (SPEC, ARCHITECTURE, MILESTONES, GUARDRAILS).
 # Kept local only; not tracked in the repo.
 docs/
+
+# Built binary (output of go build -o dbguard).
+dbguard
+dbguard.exe
