@@ -34,11 +34,11 @@
 
 ## M5. Reporting and CLI behavior
 
-- [ ] **M5.1** Implement human output
-- [ ] **M5.2** Implement JSON output
-- [ ] **M5.3** Implement review-sql command
-- [ ] **M5.4** Implement review-file command
-- [ ] **M5.5** Implement exit code behavior
+- [x] **M5.1** Implement human output
+- [x] **M5.2** Implement JSON output
+- [x] **M5.3** Implement review-sql command
+- [x] **M5.4** Implement review-file command
+- [x] **M5.5** Implement exit code behavior
 - [ ] **M5.6** Add CLI tests / smoke checks
 
 ## M6. Examples, CI, and polish
