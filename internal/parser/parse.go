@@ -99,10 +99,21 @@ func extractDropStmt(raw json.RawMessage) (Statement, error) {
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return Statement{}, err
 	}
-	// removeType: 1 = OBJECT_TABLE (from pg_query protobuf)
+	// removeType: 1 = OBJECT_TABLE, or string "OBJECT_TABLE" (pg_query_go v5 JSON)
 	removeType, _ := m["remove_type"].(float64)
-	if removeType != 1 {
-		// not DROP TABLE
+	if removeType == 0 {
+		removeType, _ = m["removeType"].(float64)
+	}
+	isTable := removeType == 1
+	if !isTable {
+		if s, _ := m["removeType"].(string); s == "OBJECT_TABLE" {
+			isTable = true
+		}
+		if s, _ := m["remove_type"].(string); s == "OBJECT_TABLE" {
+			isTable = true
+		}
+	}
+	if !isTable {
 		return Statement{Type: StmtTypeOther}, nil
 	}
 	table := extractDropObjectsTable(m)
@@ -121,7 +132,13 @@ func extractAlterTableStmt(raw json.RawMessage) (Statement, error) {
 		if cmd == nil {
 			continue
 		}
-		// AlterTableCmd: subtype 11 = AT_DropColumn, or string "AT_DropColumn"
+		// pg_query_go wraps cmd as {"AlterTableCmd": {"subtype": "AT_DropColumn", ...}}
+		if atc, ok := cmd["AlterTableCmd"].(map[string]interface{}); ok {
+			if isDropColumnCmd(atc) {
+				return Statement{Type: StmtTypeAlterTableDropCol, Table: table}, nil
+			}
+			continue
+		}
 		if isDropColumnCmd(cmd) {
 			return Statement{Type: StmtTypeAlterTableDropCol, Table: table}, nil
 		}
@@ -191,10 +208,30 @@ func extractDropObjectsTable(m map[string]interface{}) string {
 	if len(objs) == 0 {
 		return ""
 	}
-	// objects can be list of list (qualified name) or list of RangeVar nodes
+	// pg_query_go: objects is [{"List":{"items":[{"String":{"sval":"users"}}]}}] for DROP TABLE users
 	first := objs[0]
+	if listNode, ok := first.(map[string]interface{}); ok {
+		if list, ok := listNode["List"].(map[string]interface{}); ok {
+			items, _ := list["items"].([]interface{})
+			if len(items) > 0 {
+				last := items[len(items)-1]
+				if strNode, ok := last.(map[string]interface{}); ok {
+					if str, ok := strNode["String"].(map[string]interface{}); ok {
+						if s, ok := str["sval"].(string); ok {
+							return s
+						}
+					}
+					if s, ok := strNode["sval"].(string); ok {
+						return s
+					}
+				}
+			}
+		}
+		if rv := relnameFromNode(listNode); rv != "" {
+			return rv
+		}
+	}
 	if list, ok := first.([]interface{}); ok && len(list) > 0 {
-		// qualified name: take last element (table name)
 		last := list[len(list)-1]
 		if m, ok := last.(map[string]interface{}); ok {
 			if rv := relnameFromNode(m); rv != "" {
@@ -204,10 +241,6 @@ func extractDropObjectsTable(m map[string]interface{}) string {
 				return s
 			}
 		}
-		return ""
-	}
-	if m, ok := first.(map[string]interface{}); ok {
-		return relnameFromNode(m)
 	}
 	return ""
 }
