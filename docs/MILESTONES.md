@@ -17,7 +17,7 @@
 ## M3. Parser integration
 
 - [x] **M3.1** Choose PostgreSQL parser and integrate wrapper
-- [ ] **M3.2** Parse single statement SQL
+- [x] **M3.2** Parse single statement SQL
 - [ ] **M3.3** Parse multi-statement SQL
 - [ ] **M3.4** Add parser tests and document parser limitations
 
