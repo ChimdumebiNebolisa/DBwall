@@ -30,7 +30,7 @@
 - [x] **M4.5** Implement drop_column
 - [x] **M4.6** Implement writes_to_protected_tables
 - [x] **M4.7** Implement result aggregation
-- [ ] **M4.8** Add rule tests
+- [x] **M4.8** Add rule tests
 
 ## M5. Reporting and CLI behavior
 
