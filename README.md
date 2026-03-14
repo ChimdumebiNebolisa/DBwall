@@ -259,7 +259,7 @@ go vet ./...
 
 This repo’s CI builds and tests on push/PR to `main` with CGO. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-To **use dbguard in your own CI**, see the example workflow in the repo docs.
+To **use dbguard in your own CI**, see the [GitHub Action usage example](examples/GITHUB_ACTION_EXAMPLE.md).
 
 ---
 
@@ -269,6 +269,7 @@ To **use dbguard in your own CI**, see the example workflow in the repo docs.
 - [docs/MILESTONES.md](docs/MILESTONES.md) — Progress and substeps
 - [docs/GUARDRAILS.md](docs/GUARDRAILS.md) — Engineering guardrails
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Code structure and data flow
+- [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md) — Using dbguard in GitHub Actions
 
 ---
 
