@@ -12,7 +12,7 @@
 - [x] **M2.1** Define policy structs and defaults
 - [x] **M2.2** Implement YAML loading
 - [x] **M2.3** Implement validation
-- [ ] **M2.4** Test policy behavior
+- [x] **M2.4** Test policy behavior
 
 ## M3. Parser integration
 
