@@ -1,4 +1,4 @@
-# dbguard v1.0.0
+# dbguard v0.1.0
 
 First stable release of **dbguard**: an AST-based Go CLI that reviews AI-generated PostgreSQL SQL and blocks unsafe operations before execution.
 
@@ -83,7 +83,7 @@ dbguard review-file ./examples/protected_table_update.sql --policy ./examples/db
 ## Exit code contract
 
 | Code | Meaning |
-|------|--------|
+|------|---------|
 | 0 | Allow — no violations |
 | 1 | Internal or tool error |
 | 2 | Warn — at least one warning |
@@ -115,14 +115,14 @@ Use exit code **3** in CI to fail the job when unsafe SQL is detected.
 If `gh` is installed and authenticated, you can create the GitHub release with:
 
 ```bash
-git tag -a v1.0.0 -m "dbguard v1.0.0"
-git push origin v1.0.0
-gh release create v1.0.0 --title "dbguard v1.0.0" --notes-file RELEASE_NOTES_v1.0.0.md
+git tag -a v0.1.0 -m "dbguard v0.1.0"
+git push origin v0.1.0
+gh release create v0.1.0 --title "dbguard v0.1.0" --notes-file RELEASE_NOTES_v0.1.0.md
 ```
 
 To attach a built binary (e.g. for Linux):
 
 ```bash
 CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o dbguard_linux_amd64 ./cmd/dbguard
-gh release create v1.0.0 --title "dbguard v1.0.0" --notes-file RELEASE_NOTES_v1.0.0.md dbguard_linux_amd64
+gh release create v0.1.0 --title "dbguard v0.1.0" --notes-file RELEASE_NOTES_v0.1.0.md dbguard_linux_amd64
 ```
