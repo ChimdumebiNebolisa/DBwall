@@ -24,12 +24,12 @@
 ## M4. Rule engine
 
 - [x] **M4.1** Implement finding and decision model
-- [ ] **M4.2** Implement delete_without_where
-- [ ] **M4.3** Implement update_without_where
-- [ ] **M4.4** Implement drop_table
-- [ ] **M4.5** Implement drop_column
-- [ ] **M4.6** Implement writes_to_protected_tables
-- [ ] **M4.7** Implement result aggregation
+- [x] **M4.2** Implement delete_without_where
+- [x] **M4.3** Implement update_without_where
+- [x] **M4.4** Implement drop_table
+- [x] **M4.5** Implement drop_column
+- [x] **M4.6** Implement writes_to_protected_tables
+- [x] **M4.7** Implement result aggregation
 - [ ] **M4.8** Add rule tests
 
 ## M5. Reporting and CLI behavior
