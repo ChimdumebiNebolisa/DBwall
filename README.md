@@ -36,6 +36,7 @@ AI-generated SQL can include destructive or risky operations: `DELETE FROM users
 Requires Go 1.21+ and CGO (for the PostgreSQL parser). First build may take a few minutes.
 
 ```bash
+go mod tidy   # fetch dependencies and generate go.sum
 go build -o dbguard ./cmd/dbguard
 ```
 
