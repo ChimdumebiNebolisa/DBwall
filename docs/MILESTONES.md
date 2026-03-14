@@ -23,7 +23,7 @@
 
 ## M4. Rule engine
 
-- [ ] **M4.1** Implement finding and decision model
+- [x] **M4.1** Implement finding and decision model
 - [ ] **M4.2** Implement delete_without_where
 - [ ] **M4.3** Implement update_without_where
 - [ ] **M4.4** Implement drop_table
