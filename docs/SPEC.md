@@ -60,5 +60,6 @@ See examples in repo.
 
 ## Known limitations
 
-- PostgreSQL only; no semantic analysis of predicates (e.g. `WHERE 1=1` is treated as having a WHERE clause).
-- Parser and multi-statement behavior documented in parser package and MILESTONES.
+- **PostgreSQL only**; no semantic analysis of predicates (e.g. `WHERE 1=1` is treated as having a WHERE clause and does not trigger delete_without_where).
+- **Parser:** Uses pg_query_go (PostgreSQL parser); requires CGO for build; first build can take several minutes. Multi-statement input is parsed in order; each statement is analyzed independently.
+- **Table names:** Extracted from the parse tree; qualified names (schema.table) are normalized to the table part where applicable.
