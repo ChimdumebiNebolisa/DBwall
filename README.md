@@ -2,19 +2,25 @@
 
 **AST-based Go CLI that reviews AI-generated PostgreSQL SQL and blocks unsafe operations before execution.**
 
-AI agents and code assistants increasingly generate SQL and migration snippets. Those outputs can be dangerous. dbguard parses PostgreSQL SQL using a real parser, applies configurable safety rules, and returns an allow/warn/block decision. Built for developers, CI pipelines, and agent toolchains.
+AI agents and code assistants increasingly generate SQL and migration snippets. Those outputs can be dangerous—full-table deletes, schema-dropping statements, or writes to critical tables. dbguard parses PostgreSQL with a **real parser** (pg_query), applies configurable safety rules, and returns a clear **allow / warn / block** decision. Built for developers, CI pipelines, and agent toolchains.
 
 ## Why guardrails for AI-generated SQL
 
-AI-generated SQL can include destructive or risky operations: `DELETE FROM users;`, `UPDATE payments SET ...;` without a WHERE clause, `DROP TABLE`, or `ALTER TABLE ... DROP COLUMN`. Running such statements without review risks data loss and compliance issues. dbguard gives you a fast, local check before execution or before merging migrations.
+AI-generated SQL often looks correct but can be destructive: `DELETE FROM users;`, `UPDATE payments SET ...;` without a WHERE clause, `DROP TABLE`, or `ALTER TABLE ... DROP COLUMN`. Running such statements without review risks data loss and compliance violations. dbguard gives you a fast, local check **before** execution or before merging migrations—no regex heuristics, no guessing.
+
+## Why PostgreSQL AST parsing matters
+
+dbguard uses the same parser as PostgreSQL. That means statement types, table names, and presence of WHERE clauses are derived from the parse tree, not string matching. You get accurate detection of unsafe patterns without false positives from comments or string literals.
+
+---
 
 ## What dbguard is
 
-- A local CLI
-- PostgreSQL-only (v1)
-- AST-based, not regex-based
-- Focused on a small, credible rule set
-- Designed for reliability and strong resume value
+- A **local CLI** — no cloud, no API keys
+- **PostgreSQL-only** (v1)
+- **AST-based**, not regex-based
+- A small, credible rule set
+- CI-friendly exit codes and JSON output
 
 ## What dbguard is not
 
@@ -22,55 +28,173 @@ AI-generated SQL can include destructive or risky operations: `DELETE FROM users
 - A database proxy, generic SQL linter, or query planner
 - A full migration engine
 
+---
+
 ## v1 features
 
-- Accept PostgreSQL SQL from string or file
-- Parse with a real PostgreSQL parser (pg_query_go)
-- Apply v1 safety rules: DELETE/UPDATE without WHERE, DROP TABLE, ALTER TABLE DROP COLUMN, writes to protected tables
-- Load configurable policy from YAML
-- Human-readable and JSON reports
-- Exit codes suitable for CI
+| Feature | Description |
+|--------|-------------|
+| **DELETE without WHERE** | Block (default) or configurable |
+| **UPDATE without WHERE** | Block (default) or configurable |
+| **DROP TABLE** | Block (default) or configurable |
+| **ALTER TABLE … DROP COLUMN** | Block (default) or configurable |
+| **Writes to protected tables** | Warn (default); table list from policy |
+| **Decisions** | allow / warn / block with configurable policy |
+| **Exit codes** | 0 allow, 1 error, 2 warn, 3 block — for CI |
+
+---
 
 ## Installation
 
-Requires Go 1.21+ and CGO (for the PostgreSQL parser). First build may take a few minutes.
+Requires **Go 1.21+** and **CGO** (for the PostgreSQL parser). First build may take a few minutes.
 
 ```bash
-go mod tidy   # fetch dependencies and generate go.sum
+git clone https://github.com/ChimdumebiNebolisa/DBwall.git
+cd DBwall
+go mod tidy
 go build -o dbguard ./cmd/dbguard
 ```
 
-## Usage
+On Windows the binary will be `dbguard.exe`; use `.\dbguard.exe` in examples below if needed.
 
-**Review inline SQL**
+---
 
-```bash
-dbguard review-sql "DELETE FROM users;"
-```
+## Demo
 
-**Review a SQL file**
+### 1. DELETE without WHERE → blocked
 
 ```bash
-dbguard review-file ./examples/delete_all.sql
+$ dbguard review-sql "DELETE FROM users;"
 ```
 
-**With a policy file**
+**Expected output:**
+
+```
+Decision: BLOCK
+Severity: CRITICAL
+
+Statement 1:
+  Type: DELETE
+  Table: users
+  Triggered Rules:
+    - delete_without_where
+  Reason:
+    - DELETE statement has no WHERE clause
+  Recommendation:
+    - Add a restricting predicate or require manual approval
+```
+
+**Exit code:** `3`
+
+---
+
+### 2. DROP TABLE → blocked
 
 ```bash
-dbguard review-file ./examples/delete_all.sql --policy ./examples/dbguard.yaml
+$ dbguard review-sql "DROP TABLE users;"
 ```
 
-**JSON output (for CI or pipelines)**
+**Expected output:**
+
+```
+Decision: BLOCK
+Severity: CRITICAL
+
+Statement 1:
+  Type: DROP_TABLE
+  Table: users
+  Triggered Rules:
+    - drop_table
+  Reason:
+    - DROP TABLE statement
+  ...
+```
+
+**Exit code:** `3`
+
+---
+
+### 3. Safe SELECT → allowed
 
 ```bash
-dbguard review-sql "DROP TABLE users;" --format json
+$ dbguard review-sql "SELECT 1;" --format json
 ```
 
-**Version**
+**Expected output (excerpt):**
+
+```json
+{
+  "decision": "allow",
+  "severity": "low",
+  "statements": [
+    {
+      "index": 1,
+      "type": "SELECT",
+      "table": "",
+      "findings": []
+    }
+  ]
+}
+```
+
+**Exit code:** `0`
+
+---
+
+### 4. Protected table → warn (with policy)
 
 ```bash
-dbguard version
+$ dbguard review-file ./examples/protected_table_update.sql --policy ./examples/dbguard.yaml
 ```
+
+Example file content: `UPDATE users SET role = 'viewer' WHERE id = 1;`  
+With `users` in `protected_tables`, the write is flagged.
+
+**Expected output (excerpt):**
+
+```
+Decision: WARN
+Severity: MEDIUM
+
+Statement 1:
+  Type: UPDATE
+  Table: users
+  Triggered Rules:
+    - writes_to_protected_tables
+  Reason:
+    - Write to protected table: users
+  ...
+```
+
+**Exit code:** `2`
+
+---
+
+## Suggested screenshots (capture later)
+
+Screenshots are not generated in this repo. Capture these locally for docs or the README:
+
+| # | Description | Command to run |
+|---|-------------|----------------|
+| 1 | Terminal: DELETE without WHERE blocked | `dbguard review-sql "DELETE FROM users;"` |
+| 2 | Terminal: Safe SELECT allowed with JSON output | `dbguard review-sql "SELECT 1;" --format json` |
+| 3 | Terminal: Protected table warning with policy | `dbguard review-file ./examples/protected_table_update.sql --policy ./examples/dbguard.yaml` |
+
+Store under `docs/assets/` (e.g. `demo-block.png`, `demo-allow-json.png`, `demo-protected-warn.png`) and link from the README when added.
+
+---
+
+## Quick reference
+
+| Command | Purpose |
+|--------|---------|
+| `dbguard review-sql "<sql>"` | Review inline SQL |
+| `dbguard review-file <path>` | Review a SQL file |
+| `dbguard review-file <path> --policy <yaml>` | Use a policy file |
+| `dbguard review-sql "..." --format json` | JSON output for CI |
+| `dbguard version` | Print version |
+
+---
 
 ## Policy file
 
@@ -94,49 +218,59 @@ rules:
 
 See [examples/dbguard.yaml](examples/dbguard.yaml).
 
+---
+
 ## Exit codes
 
 | Code | Meaning |
 |------|--------|
-| 0 | Allow – no violations |
+| 0 | Allow — no violations |
 | 1 | Internal or tool error |
-| 2 | Warn – at least one warning |
-| 3 | Block – at least one blocking violation |
+| 2 | Warn — at least one warning |
+| 3 | Block — at least one blocking violation |
 
-Use in CI: `dbguard review-file migration.sql; exitcode=$?; [ $exitcode -eq 0 ] || [ $exitcode -eq 2 ]` to allow or warn but fail on block.
+**CI:** Fail the job on block (exit 3); optionally fail on warn (exit 2). Example:  
+`dbguard review-file migration.sql; exit $?` (fail on any non-zero).
+
+---
 
 ## Limitations (v1)
 
 - **PostgreSQL only.** No other dialects.
 - **No semantic predicate analysis.** e.g. `DELETE FROM users WHERE 1=1` has a WHERE clause and does not trigger `delete_without_where`.
-- **Parser:** Build requires CGO; first compile can take several minutes (PostgreSQL parser).
+- **Build:** Requires CGO; first compile can take several minutes (PostgreSQL parser).
 
 See [docs/SPEC.md](docs/SPEC.md) for full specification and limitations.
+
+---
 
 ## Local development
 
 ```bash
 go build ./cmd/dbguard
 go test ./...
-```
-
-Format and vet:
-
-```bash
 go fmt ./...
 go vet ./...
 ```
 
+---
+
 ## CI
 
-GitHub Actions runs on push/PR to `main`: build and test with CGO enabled. See [.github/workflows/ci.yml](.github/workflows/ci.yml). First run may be slow due to parser build.
+This repo’s CI builds and tests on push/PR to `main` with CGO. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
+
+To **use dbguard in your own CI**, see the example workflow in the repo docs.
+
+---
 
 ## Documentation
 
-- [docs/SPEC.md](docs/SPEC.md) – Problem, scope, rules, CLI contract, policy schema
-- [docs/MILESTONES.md](docs/MILESTONES.md) – Progress and substeps
-- [docs/GUARDRAILS.md](docs/GUARDRAILS.md) – Engineering guardrails
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) – Code structure and data flow
+- [docs/SPEC.md](docs/SPEC.md) — Problem, scope, rules, CLI contract, policy schema
+- [docs/MILESTONES.md](docs/MILESTONES.md) — Progress and substeps
+- [docs/GUARDRAILS.md](docs/GUARDRAILS.md) — Engineering guardrails
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Code structure and data flow
+
+---
 
 ## License
 
