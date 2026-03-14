@@ -39,7 +39,7 @@
 - [x] **M5.3** Implement review-sql command
 - [x] **M5.4** Implement review-file command
 - [x] **M5.5** Implement exit code behavior
-- [ ] **M5.6** Add CLI tests / smoke checks
+- [x] **M5.6** Add CLI tests / smoke checks
 
 ## M6. Examples, CI, and polish
 

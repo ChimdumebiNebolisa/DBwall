@@ -75,6 +75,11 @@ func printAndExit(res *analyzer.Result, format string) int {
 	return decisionToExit(res.Decision)
 }
 
+// ExitCodeForDecision maps decision to exit code (for testing and documentation).
+func ExitCodeForDecision(d policy.Decision) int {
+	return decisionToExit(d)
+}
+
 func decisionToExit(d policy.Decision) int {
 	switch d {
 	case policy.DecisionBlock:
