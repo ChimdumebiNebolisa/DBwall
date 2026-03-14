@@ -3,7 +3,7 @@
 ## M1. Repository and scaffold
 
 - [x] **M1.1** Initialize Go module and CLI scaffold
-- [ ] **M1.2** Create repo structure and placeholder packages
+- [x] **M1.2** Create repo structure and placeholder packages
 - [ ] **M1.3** Create README and docs skeleton
 - [ ] **M1.4** Add Makefile and basic developer commands
 

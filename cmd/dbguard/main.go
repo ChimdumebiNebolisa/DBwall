@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ChimdumebiNebolisa/DBwall/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +27,7 @@ func versionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "Print dbguard version",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Version will be injected by internal/version
-			fmt.Println("dbguard version 0.1.0")
+			fmt.Printf("dbguard version %s\n", version.Version)
 			return nil
 		},
 	}
