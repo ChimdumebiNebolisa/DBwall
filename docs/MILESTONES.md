@@ -10,7 +10,7 @@
 ## M2. Policy system
 
 - [x] **M2.1** Define policy structs and defaults
-- [ ] **M2.2** Implement YAML loading
+- [x] **M2.2** Implement YAML loading
 - [ ] **M2.3** Implement validation
 - [ ] **M2.4** Test policy behavior
 
