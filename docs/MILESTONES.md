@@ -44,6 +44,6 @@
 ## M6. Examples, CI, and polish
 
 - [x] **M6.1** Add example SQL files and policy file
-- [ ] **M6.2** Add GitHub Actions workflow
+- [x] **M6.2** Add GitHub Actions workflow
 - [ ] **M6.3** Tighten README and docs
 - [ ] **M6.4** Final test pass and cleanup
