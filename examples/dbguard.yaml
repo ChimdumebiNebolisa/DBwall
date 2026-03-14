@@ -1,0 +1,13 @@
+dialect: postgres
+
+protected_tables:
+  - users
+  - payments
+  - audit_logs
+
+rules:
+  delete_without_where: block
+  update_without_where: block
+  drop_table: block
+  drop_column: block
+  writes_to_protected_tables: warn
