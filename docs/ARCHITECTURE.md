@@ -36,4 +36,6 @@ Layers are separated to keep parser, policy, rules, and CLI independent.
 - `internal/report` – Output formatters.
 - `internal/version` – Version constant.
 
-Details will be expanded as implementation progresses.
+## Review flow
+
+`review-sql` / `review-file` → `cli.ReviewSQL` or `ReviewFile` → load policy (`policy.LoadFromFile` or default) → `parser.Parse(sql)` → `analyzer.Analyze(stmts, policy)` → `rules.Check` per statement → aggregate decision/severity → `report.Human` or `report.JSON` → print and exit with `cli.ExitAllow` / `ExitWarn` / `ExitBlock` / `ExitError`.
