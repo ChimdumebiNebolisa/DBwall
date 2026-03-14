@@ -75,3 +75,22 @@ func TestAnalyze_NilPolicy_UsesDefaults(t *testing.T) {
 		t.Errorf("nil policy should use defaults (block), got %s", res.Decision)
 	}
 }
+
+// TestAnalyze_Integration_RealParser asserts the full pipeline (parser → analyzer) for contract SQL.
+// Uses the real pg_query_go parser; fails if JSON extraction or rule logic is wrong.
+func TestAnalyze_Integration_RealParser(t *testing.T) {
+	stmts, err := parser.Parse("DELETE FROM users;")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	res := Analyze(stmts, policy.DefaultPolicy())
+	if res.Decision != policy.DecisionBlock {
+		t.Errorf("contract: DELETE FROM users; should yield block, got %s", res.Decision)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("parser should return 1 statement, got %d", len(stmts))
+	}
+	if stmts[0].Table != "users" {
+		t.Errorf("parser should extract table users, got %q", stmts[0].Table)
+	}
+}
