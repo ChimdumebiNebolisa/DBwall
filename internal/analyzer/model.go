@@ -33,7 +33,7 @@ type StatementResult struct {
 
 // Result is the full analysis result.
 type Result struct {
-	Decision  policy.Decision
-	Severity  Severity
+	Decision   policy.Decision
+	Severity   Severity
 	Statements []StatementResult
 }

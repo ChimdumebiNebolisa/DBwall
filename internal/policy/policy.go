@@ -29,9 +29,9 @@ const (
 
 // Policy holds dialect, protected tables, and per-rule decisions.
 type Policy struct {
-	Dialect          Dialect           `yaml:"dialect"`
-	ProtectedTables  []string          `yaml:"protected_tables"`
-	Rules            map[string]string `yaml:"rules"` // rule name -> "allow"|"warn"|"block"
+	Dialect         Dialect           `yaml:"dialect"`
+	ProtectedTables []string          `yaml:"protected_tables"`
+	Rules           map[string]string `yaml:"rules"` // rule name -> "allow"|"warn"|"block"
 }
 
 // DefaultPolicy returns the built-in v1 default policy.

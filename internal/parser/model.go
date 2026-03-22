@@ -4,13 +4,13 @@ package parser
 type StmtType string
 
 const (
-	StmtTypeDelete             StmtType = "DELETE"
-	StmtTypeUpdate             StmtType = "UPDATE"
-	StmtTypeDropTable          StmtType = "DROP_TABLE"
-	StmtTypeAlterTableDropCol  StmtType = "ALTER_TABLE_DROP_COLUMN"
-	StmtTypeSelect             StmtType = "SELECT"
-	StmtTypeInsert             StmtType = "INSERT"
-	StmtTypeOther              StmtType = "OTHER"
+	StmtTypeDelete            StmtType = "DELETE"
+	StmtTypeUpdate            StmtType = "UPDATE"
+	StmtTypeDropTable         StmtType = "DROP_TABLE"
+	StmtTypeAlterTableDropCol StmtType = "ALTER_TABLE_DROP_COLUMN"
+	StmtTypeSelect            StmtType = "SELECT"
+	StmtTypeInsert            StmtType = "INSERT"
+	StmtTypeOther             StmtType = "OTHER"
 )
 
 // Statement is an analyzer-friendly representation of one SQL statement.
