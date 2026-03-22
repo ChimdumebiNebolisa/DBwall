@@ -17,6 +17,14 @@ var ValidRuleNames = []string{
 	RuleWritesToProtectedTable,
 }
 
+var validRuleNamesMap = map[string]bool{
+	RuleDeleteWithoutWhere:     true,
+	RuleUpdateWithoutWhere:     true,
+	RuleDropTable:              true,
+	RuleDropColumn:             true,
+	RuleWritesToProtectedTable: true,
+}
+
 // ValidDecisions are allowed values for rule actions.
 var ValidDecisions = map[string]bool{
 	"allow": true,
@@ -42,14 +50,7 @@ func Validate(p *Policy) error {
 			if !ValidDecisions[v] {
 				return fmt.Errorf("invalid rule decision for %q: %q (must be allow, warn, or block)", k, v)
 			}
-			known := false
-			for _, name := range ValidRuleNames {
-				if name == k {
-					known = true
-					break
-				}
-			}
-			if !known {
+			if !validRuleNamesMap[k] {
 				return fmt.Errorf("unknown rule name in policy: %q", k)
 			}
 		}
