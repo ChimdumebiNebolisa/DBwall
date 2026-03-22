@@ -48,9 +48,9 @@ func parseJSONToStatements(jsonStr string) ([]Statement, error) {
 func extractStatement(typeKey string, raw json.RawMessage) (Statement, error) {
 	switch typeKey {
 	case "DeleteStmt":
-		return extractDeleteStmt(raw)
+		return extractTableAndWhereStmt(raw, StmtTypeDelete)
 	case "UpdateStmt":
-		return extractUpdateStmt(raw)
+		return extractTableAndWhereStmt(raw, StmtTypeUpdate)
 	case "DropStmt":
 		return extractDropStmt(raw)
 	case "AlterTableStmt":
@@ -74,24 +74,14 @@ func stmtTypeFromKey(k string) StmtType {
 	}
 }
 
-func extractDeleteStmt(raw json.RawMessage) (Statement, error) {
+func extractTableAndWhereStmt(raw json.RawMessage, stype StmtType) (Statement, error) {
 	var m map[string]interface{}
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return Statement{}, err
 	}
 	table := extractRelation(m)
 	hasWhere := hasWhereClause(m)
-	return Statement{Type: StmtTypeDelete, Table: table, HasWhere: hasWhere}, nil
-}
-
-func extractUpdateStmt(raw json.RawMessage) (Statement, error) {
-	var m map[string]interface{}
-	if err := json.Unmarshal(raw, &m); err != nil {
-		return Statement{}, err
-	}
-	table := extractRelation(m)
-	hasWhere := hasWhereClause(m)
-	return Statement{Type: StmtTypeUpdate, Table: table, HasWhere: hasWhere}, nil
+	return Statement{Type: stype, Table: table, HasWhere: hasWhere}, nil
 }
 
 func extractDropStmt(raw json.RawMessage) (Statement, error) {
