@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	pg_query "github.com/pganalyze/pg_query_go/v5"
 )
@@ -171,16 +172,33 @@ func relationRelname(rel interface{}) string {
 	if !ok {
 		return ""
 	}
+
+	schema := ""
+	name := ""
+
 	// RangeVar can have "relname" directly
 	if n, ok := m["relname"].(string); ok {
-		return n
-	}
-	// or nested under "RangeVar" key (protobuf oneof)
-	if rv, ok := m["RangeVar"].(map[string]interface{}); ok {
+		name = n
+		if s, ok := m["schemaname"].(string); ok {
+			schema = s
+		}
+	} else if rv, ok := m["RangeVar"].(map[string]interface{}); ok {
+		// or nested under "RangeVar" key (protobuf oneof)
 		if n, ok := rv["relname"].(string); ok {
-			return n
+			name = n
+			if s, ok := rv["schemaname"].(string); ok {
+				schema = s
+			}
 		}
 	}
+
+	if name != "" {
+		if schema != "" {
+			return schema + "." + name
+		}
+		return name
+	}
+
 	for _, v := range m {
 		if s := relationRelname(v); s != "" {
 			return s
@@ -214,16 +232,20 @@ func extractDropObjectsTable(m map[string]interface{}) string {
 		if list, ok := listNode["List"].(map[string]interface{}); ok {
 			items, _ := list["items"].([]interface{})
 			if len(items) > 0 {
-				last := items[len(items)-1]
-				if strNode, ok := last.(map[string]interface{}); ok {
-					if str, ok := strNode["String"].(map[string]interface{}); ok {
-						if s, ok := str["sval"].(string); ok {
-							return s
+				var parts []string
+				for _, item := range items {
+					if strNode, ok := item.(map[string]interface{}); ok {
+						if str, ok := strNode["String"].(map[string]interface{}); ok {
+							if s, ok := str["sval"].(string); ok {
+								parts = append(parts, s)
+							}
+						} else if s, ok := strNode["sval"].(string); ok {
+							parts = append(parts, s)
 						}
 					}
-					if s, ok := strNode["sval"].(string); ok {
-						return s
-					}
+				}
+				if len(parts) > 0 {
+					return strings.Join(parts, ".")
 				}
 			}
 		}
@@ -232,28 +254,51 @@ func extractDropObjectsTable(m map[string]interface{}) string {
 		}
 	}
 	if list, ok := first.([]interface{}); ok && len(list) > 0 {
-		last := list[len(list)-1]
-		if m, ok := last.(map[string]interface{}); ok {
-			if rv := relnameFromNode(m); rv != "" {
-				return rv
+		var parts []string
+		for _, item := range list {
+			if m, ok := item.(map[string]interface{}); ok {
+				if rv := relnameFromNode(m); rv != "" {
+					return rv
+				}
+				if s, ok := m["sval"].(string); ok {
+					parts = append(parts, s)
+				}
 			}
-			if s, ok := m["sval"].(string); ok {
-				return s
-			}
+		}
+		if len(parts) > 0 {
+			return strings.Join(parts, ".")
 		}
 	}
 	return ""
 }
 
 func relnameFromNode(m map[string]interface{}) string {
+	schema := ""
+	name := ""
+
 	if rv, ok := m["RangeVar"].(map[string]interface{}); ok {
 		if n, ok := rv["relname"].(string); ok {
-			return n
+			name = n
+			if s, ok := rv["schemaname"].(string); ok {
+				schema = s
+			}
 		}
 	}
+
 	if n, ok := m["relname"].(string); ok {
-		return n
+		name = n
+		if s, ok := m["schemaname"].(string); ok {
+			schema = s
+		}
 	}
+
+	if name != "" {
+		if schema != "" {
+			return schema + "." + name
+		}
+		return name
+	}
+
 	for _, v := range m {
 		if vm, ok := v.(map[string]interface{}); ok {
 			if s := relnameFromNode(vm); s != "" {

@@ -16,7 +16,7 @@ func TestHuman_ContainsDecisionAndSeverity(t *testing.T) {
 		Statements: []analyzer.StatementResult{{
 			Index: 1,
 			Type:  "DELETE",
-			Table:  "users",
+			Table: "users",
 			Findings: []analyzer.Finding{{
 				Rule:     "delete_without_where",
 				Severity: analyzer.SeverityCritical,
@@ -47,7 +47,7 @@ func TestJSON_ValidStructure(t *testing.T) {
 		Statements: []analyzer.StatementResult{{
 			Index: 1,
 			Type:  "DELETE",
-			Table:  "users",
+			Table: "users",
 			Findings: []analyzer.Finding{{
 				Rule:     "delete_without_where",
 				Severity: analyzer.SeverityCritical,

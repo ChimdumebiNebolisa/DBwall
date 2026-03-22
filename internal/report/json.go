@@ -15,9 +15,9 @@ type JSONOutput struct {
 
 // JSONStatement is one statement in the JSON output.
 type JSONStatement struct {
-	Index    int          `json:"index"`
-	Type     string       `json:"type"`
-	Table    string       `json:"table"`
+	Index    int           `json:"index"`
+	Type     string        `json:"type"`
+	Table    string        `json:"table"`
 	Findings []JSONFinding `json:"findings"`
 }
 
