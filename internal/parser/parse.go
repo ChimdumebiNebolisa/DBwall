@@ -55,9 +55,10 @@ func extractStatement(typeKey string, raw json.RawMessage) (Statement, error) {
 		return extractDropStmt(raw)
 	case "AlterTableStmt":
 		return extractAlterTableStmt(raw)
-	case "SelectStmt", "InsertStmt":
-		// Pass through for reporting; we may need table for InsertStmt later
-		return Statement{Type: stmtTypeFromKey(typeKey), Table: tableFromRaw(raw)}, nil
+	case "SelectStmt":
+		return extractSelectStmt(raw)
+	case "InsertStmt":
+		return extractInsertStmt(raw)
 	default:
 		return Statement{Type: StmtTypeOther}, nil
 	}
@@ -270,4 +271,33 @@ func tableFromRaw(raw json.RawMessage) string {
 		return ""
 	}
 	return extractRelation(m)
+}
+
+func extractSelectStmt(raw json.RawMessage) (Statement, error) {
+	var m map[string]interface{}
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return Statement{}, err
+	}
+	var table string
+	// fromClause is a list of nodes
+	for _, key := range []string{"from_clause", "fromClause"} {
+		if fc, ok := m[key].([]interface{}); ok && len(fc) > 0 {
+			// for now, just take the first one
+			if first, ok := fc[0].(map[string]interface{}); ok {
+				table = relnameFromNode(first)
+			}
+			break
+		}
+	}
+	hasWhere := hasWhereClause(m)
+	return Statement{Type: StmtTypeSelect, Table: table, HasWhere: hasWhere}, nil
+}
+
+func extractInsertStmt(raw json.RawMessage) (Statement, error) {
+	var m map[string]interface{}
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return Statement{}, err
+	}
+	table := extractRelation(m)
+	return Statement{Type: StmtTypeInsert, Table: table}, nil
 }

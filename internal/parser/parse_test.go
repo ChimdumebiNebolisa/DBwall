@@ -109,3 +109,61 @@ func TestParse_AlterTableDropColumn(t *testing.T) {
 		t.Errorf("want table t1, got %q", stmts[0].Table)
 	}
 }
+
+func TestParse_SelectBasic(t *testing.T) {
+	stmts, err := Parse("SELECT * FROM users;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("want 1 statement, got %d", len(stmts))
+	}
+	if stmts[0].Type != StmtTypeSelect {
+		t.Errorf("want type SELECT, got %s", stmts[0].Type)
+	}
+	if stmts[0].Table != "users" {
+		t.Errorf("want table users, got %q", stmts[0].Table)
+	}
+}
+
+func TestParse_SelectWithWhere(t *testing.T) {
+	stmts, err := Parse("SELECT * FROM users WHERE id = 1;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("want 1 statement, got %d", len(stmts))
+	}
+	if !stmts[0].HasWhere {
+		t.Error("want HasWhere true")
+	}
+}
+
+func TestParse_SelectNoFrom(t *testing.T) {
+	stmts, err := Parse("SELECT 1;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("want 1 statement, got %d", len(stmts))
+	}
+	if stmts[0].Table != "" {
+		t.Errorf("want empty table, got %q", stmts[0].Table)
+	}
+}
+
+func TestParse_InsertBasic(t *testing.T) {
+	stmts, err := Parse("INSERT INTO users (id) VALUES (1);")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("want 1 statement, got %d", len(stmts))
+	}
+	if stmts[0].Type != StmtTypeInsert {
+		t.Errorf("want type INSERT, got %s", stmts[0].Type)
+	}
+	if stmts[0].Table != "users" {
+		t.Errorf("want table users, got %q", stmts[0].Table)
+	}
+}
