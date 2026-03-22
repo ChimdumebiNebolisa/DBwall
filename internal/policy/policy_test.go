@@ -86,11 +86,14 @@ func TestLoadFromBytes_InvalidYAML(t *testing.T) {
 }
 
 func TestLoadFromFile(t *testing.T) {
-	dir := t.TempDir()
-	f := filepath.Join(dir, "policy.yaml")
+	// Need to work within CWD for current LoadFromFile implementation
+	cwd, _ := os.Getwd()
+	f := filepath.Join(cwd, "test_policy.yaml")
 	if err := os.WriteFile(f, []byte("dialect: postgres\nprotected_tables: []\n"), 0644); err != nil {
 		t.Fatalf("write temp file: %v", err)
 	}
+	defer os.Remove(f)
+
 	p, err := LoadFromFile(f)
 	if err != nil {
 		t.Fatalf("LoadFromFile: %v", err)
@@ -101,9 +104,23 @@ func TestLoadFromFile(t *testing.T) {
 }
 
 func TestLoadFromFile_NotFound(t *testing.T) {
-	_, err := LoadFromFile("/nonexistent/dbguard.yaml")
+	_, err := LoadFromFile("nonexistent_dbguard.yaml")
 	if err == nil {
 		t.Fatal("expected error for missing file")
+	}
+}
+
+func TestLoadFromFile_PathTraversal(t *testing.T) {
+	// Test that an absolute path outside CWD is blocked.
+	_, err := LoadFromFile("/etc/passwd")
+	if err == nil {
+		t.Fatal("expected error for path traversal attempt (absolute path outside CWD)")
+	}
+
+	// Test that a relative path escaping CWD is blocked.
+	_, err = LoadFromFile("../../../etc/passwd")
+	if err == nil {
+		t.Fatal("expected error for path traversal attempt (relative path escaping CWD)")
 	}
 }
 
