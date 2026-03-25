@@ -1,4 +1,4 @@
-# dbguard
+# DBwall
 
 **AST-based Go CLI that reviews AI-generated PostgreSQL SQL and blocks unsafe operations before execution.**
 
