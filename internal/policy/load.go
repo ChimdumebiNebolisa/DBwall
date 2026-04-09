@@ -34,6 +34,9 @@ func LoadFromFile(path string) (*Policy, error) {
 
 	data, err := os.ReadFile(absPath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("read policy file: no such file or directory: %s", absPath)
+		}
 		return nil, fmt.Errorf("read policy file: %w", err)
 	}
 	return LoadFromBytes(data)

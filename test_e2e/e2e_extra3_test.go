@@ -1,20 +1,13 @@
 package test_e2e
 
 import (
-	"os"
 	"os/exec"
 	"strings"
 	"testing"
 )
 
 func TestCLIE2EBasic(t *testing.T) {
-	cmd := exec.Command("go", "build", "-o", "dbguard_test_bin", "../cmd/dbguard")
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	if err := cmd.Run(); err != nil {
-		t.Fatalf("Failed to build dbguard: %v", err)
-	}
-	defer os.Remove("dbguard_test_bin")
+	bin := buildBinary(t)
 
 	tests := []struct {
 		name     string
@@ -44,7 +37,7 @@ func TestCLIE2EBasic(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := exec.Command("./dbguard_test_bin", tt.args...)
+			cmd := exec.Command(bin, tt.args...)
 			output, err := cmd.CombinedOutput()
 
 			var exitCode int

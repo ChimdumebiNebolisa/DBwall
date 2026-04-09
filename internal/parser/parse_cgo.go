@@ -1,3 +1,5 @@
+//go:build cgo
+
 package parser
 
 import (
@@ -40,7 +42,7 @@ func parseJSONToStatements(jsonStr string) ([]Statement, error) {
 				return nil, fmt.Errorf("statement %d: %w", i+1, err)
 			}
 			out = append(out, stmt)
-			break // one statement type per wrapper
+			break
 		}
 	}
 	return out, nil
@@ -65,17 +67,6 @@ func extractStatement(typeKey string, raw json.RawMessage) (Statement, error) {
 	}
 }
 
-func stmtTypeFromKey(k string) StmtType {
-	switch k {
-	case "SelectStmt":
-		return StmtTypeSelect
-	case "InsertStmt":
-		return StmtTypeInsert
-	default:
-		return StmtTypeOther
-	}
-}
-
 func extractTableAndWhereStmt(raw json.RawMessage, stype StmtType) (Statement, error) {
 	var m map[string]interface{}
 	if err := json.Unmarshal(raw, &m); err != nil {
@@ -91,7 +82,6 @@ func extractDropStmt(raw json.RawMessage) (Statement, error) {
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return Statement{}, err
 	}
-	// removeType: 1 = OBJECT_TABLE, or string "OBJECT_TABLE" (pg_query_go v5 JSON)
 	removeType, _ := m["remove_type"].(float64)
 	if removeType == 0 {
 		removeType, _ = m["removeType"].(float64)
@@ -124,7 +114,6 @@ func extractAlterTableStmt(raw json.RawMessage) (Statement, error) {
 		if cmd == nil {
 			continue
 		}
-		// pg_query_go wraps cmd as {"AlterTableCmd": {"subtype": "AT_DropColumn", ...}}
 		if atc, ok := cmd["AlterTableCmd"].(map[string]interface{}); ok {
 			if isDropColumnCmd(atc) {
 				return Statement{Type: StmtTypeAlterTableDropCol, Table: table}, nil
@@ -135,7 +124,6 @@ func extractAlterTableStmt(raw json.RawMessage) (Statement, error) {
 			return Statement{Type: StmtTypeAlterTableDropCol, Table: table}, nil
 		}
 	}
-	// ALTER TABLE but no DROP COLUMN in this statement
 	return Statement{Type: StmtTypeOther, Table: table}, nil
 }
 
@@ -167,14 +155,12 @@ func relationRelname(rel interface{}) string {
 	schema := ""
 	name := ""
 
-	// RangeVar can have "relname" directly
 	if n, ok := m["relname"].(string); ok {
 		name = n
 		if s, ok := m["schemaname"].(string); ok {
 			schema = s
 		}
 	} else if rv, ok := m["RangeVar"].(map[string]interface{}); ok {
-		// or nested under "RangeVar" key (protobuf oneof)
 		if n, ok := rv["relname"].(string); ok {
 			name = n
 			if s, ok := rv["schemaname"].(string); ok {
@@ -199,10 +185,8 @@ func relationRelname(rel interface{}) string {
 }
 
 func hasWhereClause(m map[string]interface{}) bool {
-	// protobuf JSON may use where_clause or whereClause
 	for _, key := range []string{"where_clause", "whereClause"} {
 		if v, ok := m[key]; ok && v != nil {
-			// empty array or null means no clause
 			if arr, ok := v.([]interface{}); ok && len(arr) == 0 {
 				return false
 			}
@@ -217,7 +201,6 @@ func extractDropObjectsTable(m map[string]interface{}) string {
 	if len(objs) == 0 {
 		return ""
 	}
-	// pg_query_go: objects is [{"List":{"items":[{"String":{"sval":"users"}}]}}] for DROP TABLE users
 	first := objs[0]
 	if listNode, ok := first.(map[string]interface{}); ok {
 		if list, ok := listNode["List"].(map[string]interface{}); ok {
@@ -300,24 +283,14 @@ func relnameFromNode(m map[string]interface{}) string {
 	return ""
 }
 
-func tableFromRaw(raw json.RawMessage) string {
-	var m map[string]interface{}
-	if err := json.Unmarshal(raw, &m); err != nil {
-		return ""
-	}
-	return extractRelation(m)
-}
-
 func extractSelectStmt(raw json.RawMessage) (Statement, error) {
 	var m map[string]interface{}
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return Statement{}, err
 	}
 	var table string
-	// fromClause is a list of nodes
 	for _, key := range []string{"from_clause", "fromClause"} {
 		if fc, ok := m[key].([]interface{}); ok && len(fc) > 0 {
-			// for now, just take the first one
 			if first, ok := fc[0].(map[string]interface{}); ok {
 				table = relnameFromNode(first)
 			}
