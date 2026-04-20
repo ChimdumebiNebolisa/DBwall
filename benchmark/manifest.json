@@ -1,0 +1,63 @@
+{
+  "positive_decision": "block",
+  "cases": [
+    {
+      "id": "allow_select_constant",
+      "category": "benign",
+      "sql_file": "cases/benign/select_constant.sql",
+      "expected_decision": "allow"
+    },
+    {
+      "id": "allow_scoped_update",
+      "category": "benign",
+      "sql_file": "cases/benign/scoped_update.sql",
+      "expected_decision": "allow"
+    },
+    {
+      "id": "allow_safe_insert",
+      "category": "benign",
+      "sql_file": "cases/benign/safe_insert.sql",
+      "expected_decision": "allow"
+    },
+    {
+      "id": "borderline_protected_select_star_limit",
+      "category": "borderline",
+      "sql_file": "cases/borderline/protected_select_star_limit.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn"
+    },
+    {
+      "id": "borderline_protected_select_without_limit",
+      "category": "borderline",
+      "sql_file": "cases/borderline/protected_select_without_limit.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn"
+    },
+    {
+      "id": "borderline_protected_update",
+      "category": "borderline",
+      "sql_file": "cases/borderline/protected_update.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn"
+    },
+    {
+      "id": "block_delete_without_where",
+      "category": "dangerous",
+      "sql_file": "cases/dangerous/delete_without_where.sql",
+      "expected_decision": "block"
+    },
+    {
+      "id": "block_truncate_table",
+      "category": "dangerous",
+      "sql_file": "cases/dangerous/truncate_table.sql",
+      "expected_decision": "block"
+    },
+    {
+      "id": "block_grant_public_protected",
+      "category": "dangerous",
+      "sql_file": "cases/dangerous/grant_public_protected.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block"
+    }
+  ]
+}

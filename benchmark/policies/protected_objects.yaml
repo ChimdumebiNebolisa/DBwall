@@ -1,0 +1,17 @@
+dialect: postgres
+
+protected_tables:
+  - users
+  - payments
+
+protected_schemas:
+  - finance
+
+protected_roles:
+  - pg_read_all_data
+
+rules:
+  writes_to_protected_tables: warn
+  select_all_from_protected_table: warn
+  select_without_limit_from_protected_table: warn
+  grant_to_public_on_protected_objects: block
