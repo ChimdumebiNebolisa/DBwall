@@ -55,6 +55,12 @@ func TestCLIE2EExtra(t *testing.T) {
 			contains:  "block",
 			checkJson: true,
 		},
+		{
+			name:     "SARIF output format",
+			args:     []string{"review-file", "../examples/delete_all.sql", "--format", "sarif"},
+			exitCode: 3,
+			contains: "\"ruleId\": \"delete_without_where\"",
+		},
 	}
 
 	for _, tt := range tests {

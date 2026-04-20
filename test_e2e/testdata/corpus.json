@@ -1,0 +1,106 @@
+[
+  {
+    "id": "good_select_constant",
+    "category": "good",
+    "sql": "SELECT 1;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "good_scoped_update",
+    "category": "good",
+    "sql": "UPDATE users SET role = 'viewer' WHERE id = 1;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "borderline_protected_select_with_limit",
+    "category": "borderline",
+    "sql": "SELECT id FROM public.users LIMIT 10;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "borderline_select_all_from_protected",
+    "category": "borderline",
+    "sql": "SELECT * FROM users LIMIT 10;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "warn",
+    "expected_rules": ["select_all_from_protected_table"]
+  },
+  {
+    "id": "dangerous_delete_without_where",
+    "category": "dangerous",
+    "sql": "DELETE FROM users;",
+    "decision": "block",
+    "expected_rules": ["delete_without_where"]
+  },
+  {
+    "id": "dangerous_update_trivial_where",
+    "category": "dangerous",
+    "sql": "UPDATE users SET role = 'admin' WHERE 1 = 1;",
+    "decision": "block",
+    "expected_rules": ["update_trivial_where"]
+  },
+  {
+    "id": "dangerous_truncate",
+    "category": "dangerous",
+    "sql": "TRUNCATE TABLE users;",
+    "decision": "block",
+    "expected_rules": ["truncate_table"]
+  },
+  {
+    "id": "dangerous_drop_schema",
+    "category": "dangerous",
+    "sql": "DROP SCHEMA reporting;",
+    "decision": "block",
+    "expected_rules": ["drop_schema"]
+  },
+  {
+    "id": "dangerous_public_grant",
+    "category": "dangerous",
+    "sql": "GRANT SELECT ON TABLE users TO PUBLIC;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["grant_to_public_on_protected_objects"]
+  },
+  {
+    "id": "dangerous_copy_program",
+    "category": "dangerous",
+    "sql": "COPY users TO PROGRAM 'cat';",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["copy_to_stdout_or_program_from_protected_source"]
+  },
+  {
+    "id": "false_positive_comment_only",
+    "category": "false_positive",
+    "sql": "-- DROP TABLE users;\nSELECT id FROM orders LIMIT 5;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "false_positive_safe_grant",
+    "category": "false_positive",
+    "sql": "GRANT SELECT ON TABLE orders TO analyst;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "allow",
+    "expected_rules": []
+  }
+]

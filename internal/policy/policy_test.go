@@ -18,6 +18,12 @@ func TestDefaultPolicy(t *testing.T) {
 	if p.RuleDecision(RuleWritesToProtectedTable) != DecisionWarn {
 		t.Errorf("writes_to_protected_tables want warn, got %s", p.RuleDecision(RuleWritesToProtectedTable))
 	}
+	if p.RuleDecision(RuleTruncateTable) != DecisionBlock {
+		t.Errorf("truncate_table want block, got %s", p.RuleDecision(RuleTruncateTable))
+	}
+	if p.RuleDecision(RuleSelectWithoutLimitProtected) != DecisionWarn {
+		t.Errorf("select_without_limit_from_protected_table want warn, got %s", p.RuleDecision(RuleSelectWithoutLimitProtected))
+	}
 }
 
 func TestPolicy_RuleDecision(t *testing.T) {
@@ -50,6 +56,26 @@ func TestPolicy_IsProtectedTable(t *testing.T) {
 	pNil := (*Policy)(nil)
 	if pNil.IsProtectedTable("users") {
 		t.Error("nil policy should not protect any table")
+	}
+}
+
+func TestPolicy_ProtectedMatchingIsCaseInsensitiveAndSchemaAware(t *testing.T) {
+	p := &Policy{
+		ProtectedTables:  []string{"Users", "payments.ledger"},
+		ProtectedSchemas: []string{"Admin"},
+		ProtectedRoles:   []string{"Ops_Readonly"},
+	}
+	if !p.IsProtectedTable("public.users") {
+		t.Error("public.users should match protected table leaf name")
+	}
+	if !p.IsProtectedTable("PAYMENTS.LEDGER") {
+		t.Error("schema-qualified protected table should match case-insensitively")
+	}
+	if !p.IsProtectedTable("admin.audit_log") {
+		t.Error("protected schema should protect contained relations")
+	}
+	if !p.IsProtectedRole("ops_readonly") {
+		t.Error("protected roles should match case-insensitively")
 	}
 }
 

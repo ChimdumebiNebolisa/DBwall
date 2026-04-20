@@ -167,3 +167,61 @@ func TestParse_InsertBasic(t *testing.T) {
 		t.Errorf("want table users, got %q", stmts[0].Table)
 	}
 }
+
+func TestParse_TruncateTable(t *testing.T) {
+	stmts, err := Parse("TRUNCATE TABLE users;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 || stmts[0].Type != StmtTypeTruncate {
+		t.Fatalf("want TRUNCATE statement, got %#v", stmts)
+	}
+	if stmts[0].Table != "users" {
+		t.Errorf("want table users, got %q", stmts[0].Table)
+	}
+}
+
+func TestParse_DropSchema(t *testing.T) {
+	stmts, err := Parse("DROP SCHEMA reporting;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 || stmts[0].Type != StmtTypeDropSchema {
+		t.Fatalf("want DROP_SCHEMA statement, got %#v", stmts)
+	}
+	if stmts[0].Object != "reporting" {
+		t.Errorf("want object reporting, got %q", stmts[0].Object)
+	}
+}
+
+func TestParse_GrantRoleMembership(t *testing.T) {
+	stmts, err := Parse("GRANT pg_read_all_data TO analyst;")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 || stmts[0].Type != StmtTypeGrant {
+		t.Fatalf("want GRANT statement, got %#v", stmts)
+	}
+	if !stmts[0].IsRoleMembershipGrant {
+		t.Error("expected role membership grant")
+	}
+	if len(stmts[0].GrantedRoles) != 1 || stmts[0].GrantedRoles[0] != "pg_read_all_data" {
+		t.Errorf("unexpected granted roles: %#v", stmts[0].GrantedRoles)
+	}
+}
+
+func TestParse_CopyToProgram(t *testing.T) {
+	stmts, err := Parse("COPY users TO PROGRAM 'cat';")
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if len(stmts) != 1 || stmts[0].Type != StmtTypeCopy {
+		t.Fatalf("want COPY statement, got %#v", stmts)
+	}
+	if !stmts[0].CopyToProgram {
+		t.Error("expected COPY TO PROGRAM")
+	}
+	if stmts[0].Table != "users" {
+		t.Errorf("want table users, got %q", stmts[0].Table)
+	}
+}

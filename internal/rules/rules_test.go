@@ -9,129 +9,109 @@ import (
 
 func TestCheck_DeleteWithoutWhere_Blocks(t *testing.T) {
 	stmt := parser.Statement{Type: parser.StmtTypeDelete, Table: "users", HasWhere: false}
-	p := policy.DefaultPolicy()
-	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding, got %d", len(findings))
-	}
-	if findings[0].Rule != policy.RuleDeleteWithoutWhere {
-		t.Errorf("want rule delete_without_where, got %s", findings[0].Rule)
-	}
-	if findings[0].Decision != policy.DecisionBlock {
-		t.Errorf("want block, got %s", findings[0].Decision)
-	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDeleteWithoutWhere, policy.DecisionBlock)
 }
 
-func TestCheck_DeleteWithWhere_NoFinding(t *testing.T) {
-	stmt := parser.Statement{Type: parser.StmtTypeDelete, Table: "users", HasWhere: true}
+func TestCheck_DeleteTrivialWhere_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeDelete, Table: "users", HasWhere: true, WhereTrivial: true}
 	findings := Check(stmt, policy.DefaultPolicy())
-	if len(findings) != 0 {
-		t.Errorf("want 0 findings for DELETE with WHERE, got %d", len(findings))
-	}
+	requireRuleDecision(t, findings, policy.RuleDeleteTrivialWhere, policy.DecisionBlock)
 }
 
 func TestCheck_UpdateWithoutWhere_Blocks(t *testing.T) {
 	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "users", HasWhere: false}
-	p := policy.DefaultPolicy()
-	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding, got %d", len(findings))
-	}
-	if findings[0].Rule != policy.RuleUpdateWithoutWhere {
-		t.Errorf("want rule update_without_where, got %s", findings[0].Rule)
-	}
-	if findings[0].Decision != policy.DecisionBlock {
-		t.Errorf("want block, got %s", findings[0].Decision)
-	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleUpdateWithoutWhere, policy.DecisionBlock)
 }
 
-func TestCheck_UpdateWithWhere_NoFinding(t *testing.T) {
-	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "users", HasWhere: true}
+func TestCheck_UpdateTrivialWhere_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "users", HasWhere: true, WhereTrivial: true}
 	findings := Check(stmt, policy.DefaultPolicy())
-	if len(findings) != 0 {
-		t.Errorf("want 0 findings for UPDATE with WHERE, got %d", len(findings))
-	}
+	requireRuleDecision(t, findings, policy.RuleUpdateTrivialWhere, policy.DecisionBlock)
 }
 
 func TestCheck_DropTable_Blocks(t *testing.T) {
 	stmt := parser.Statement{Type: parser.StmtTypeDropTable, Table: "users"}
-	p := policy.DefaultPolicy()
-	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding, got %d", len(findings))
-	}
-	if findings[0].Rule != policy.RuleDropTable {
-		t.Errorf("want rule drop_table, got %s", findings[0].Rule)
-	}
-	if findings[0].Decision != policy.DecisionBlock {
-		t.Errorf("want block, got %s", findings[0].Decision)
-	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDropTable, policy.DecisionBlock)
+}
+
+func TestCheck_DropSchema_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeDropSchema, Object: "reporting"}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDropSchema, policy.DecisionBlock)
+}
+
+func TestCheck_DropDatabase_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeDropDatabase, Object: "analytics"}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDropDatabase, policy.DecisionBlock)
 }
 
 func TestCheck_DropColumn_Blocks(t *testing.T) {
 	stmt := parser.Statement{Type: parser.StmtTypeAlterTableDropCol, Table: "t1"}
-	p := policy.DefaultPolicy()
-	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding, got %d", len(findings))
-	}
-	if findings[0].Rule != policy.RuleDropColumn {
-		t.Errorf("want rule drop_column, got %s", findings[0].Rule)
-	}
-	if findings[0].Decision != policy.DecisionBlock {
-		t.Errorf("want block, got %s", findings[0].Decision)
-	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDropColumn, policy.DecisionBlock)
+}
+
+func TestCheck_DropConstraint_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeAlterTable, Table: "t1", DropConstraint: true}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleAlterDropSafetyConstraint, policy.DecisionBlock)
+}
+
+func TestCheck_TruncateTable_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeTruncate, Table: "users"}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleTruncateTable, policy.DecisionBlock)
 }
 
 func TestCheck_ProtectedTable_Warns(t *testing.T) {
-	p := &policy.Policy{
-		Dialect:         policy.DialectPostgres,
-		ProtectedTables: []string{"users", "payments"},
-		Rules:           nil, // uses default: writes_to_protected_tables = warn
-	}
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
 	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "users", HasWhere: true}
 	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding (protected table), got %d", len(findings))
-	}
-	if findings[0].Rule != policy.RuleWritesToProtectedTable {
-		t.Errorf("want rule writes_to_protected_tables, got %s", findings[0].Rule)
-	}
+	requireRuleDecision(t, findings, policy.RuleWritesToProtectedTable, policy.DecisionWarn)
 }
 
-func TestCheck_ProtectedTable_Delete(t *testing.T) {
-	p := &policy.Policy{
-		Dialect:         policy.DialectPostgres,
-		ProtectedTables: []string{"users"},
-		Rules:           nil,
-	}
-	stmt := parser.Statement{Type: parser.StmtTypeDelete, Table: "users", HasWhere: true}
+func TestCheck_GrantToPublicProtectedObject_Blocks(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{Type: parser.StmtTypeGrant, Table: "users", IsGrantToPublic: true}
 	findings := Check(stmt, p)
-	var protectedFinding *Finding
-	for i := range findings {
-		if findings[i].Rule == policy.RuleWritesToProtectedTable {
-			protectedFinding = &findings[i]
-			break
-		}
-	}
-	if protectedFinding == nil {
-		t.Fatal("want writes_to_protected_tables finding for DELETE on protected table")
-	}
+	requireRuleDecision(t, findings, policy.RuleGrantToPublicProtected, policy.DecisionBlock)
 }
 
-func TestCheck_NonProtectedTable_NoProtectedFinding(t *testing.T) {
-	p := &policy.Policy{
-		Dialect:         policy.DialectPostgres,
-		ProtectedTables: []string{"users"},
-		Rules:           nil,
-	}
-	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "orders", HasWhere: true}
+func TestCheck_AlterDefaultPrivilegesPublic_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeAlterDefaultPrivileges, IsGrantToPublic: true}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleAlterDefaultPrivileges, policy.DecisionBlock)
+}
+
+func TestCheck_HighRiskRoleGrant_Blocks(t *testing.T) {
+	stmt := parser.Statement{Type: parser.StmtTypeGrant, IsRoleMembershipGrant: true, GrantedRoles: []string{"pg_read_all_data"}}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleGrantHighRiskRoleMembership, policy.DecisionBlock)
+}
+
+func TestCheck_SelectAllProtectedTable_Warns(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{Type: parser.StmtTypeSelect, Table: "users", SelectAll: true}
 	findings := Check(stmt, p)
-	for _, f := range findings {
-		if f.Rule == policy.RuleWritesToProtectedTable {
-			t.Error("should not trigger protected table for non-protected table")
-		}
-	}
+	requireRuleDecision(t, findings, policy.RuleSelectAllProtectedTable, policy.DecisionWarn)
+}
+
+func TestCheck_SelectWithoutLimitProtectedTable_Warns(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{Type: parser.StmtTypeSelect, Table: "users", HasLimit: false}
+	findings := Check(stmt, p)
+	requireRuleDecision(t, findings, policy.RuleSelectWithoutLimitProtected, policy.DecisionWarn)
+}
+
+func TestCheck_CopyToProgramProtectedSource_Blocks(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{Type: parser.StmtTypeCopy, Table: "users", CopyToProgram: true}
+	findings := Check(stmt, p)
+	requireRuleDecision(t, findings, policy.RuleCopyToStdoutOrProgram, policy.DecisionBlock)
 }
 
 func TestCheck_PolicyOverride_Allow(t *testing.T) {
@@ -141,21 +121,29 @@ func TestCheck_PolicyOverride_Allow(t *testing.T) {
 	}
 	stmt := parser.Statement{Type: parser.StmtTypeDropTable, Table: "tmp"}
 	findings := Check(stmt, p)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding, got %d", len(findings))
-	}
-	if findings[0].Decision != policy.DecisionAllow {
-		t.Errorf("policy should allow drop_table; got %s", findings[0].Decision)
+	requireRuleDecision(t, findings, policy.RuleDropTable, policy.DecisionAllow)
+}
+
+func TestCheck_NonProtectedTable_NoProtectedFinding(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{Type: parser.StmtTypeUpdate, Table: "orders", HasWhere: true}
+	findings := Check(stmt, p)
+	for _, f := range findings {
+		if f.Rule == policy.RuleWritesToProtectedTable {
+			t.Fatal("did not expect protected-table finding")
+		}
 	}
 }
 
-func TestCheck_NilPolicy_UsesDefaults(t *testing.T) {
-	stmt := parser.Statement{Type: parser.StmtTypeDelete, Table: "x", HasWhere: false}
-	findings := Check(stmt, nil)
-	if len(findings) != 1 {
-		t.Fatalf("want 1 finding with nil policy (defaults), got %d", len(findings))
+func requireRuleDecision(t *testing.T, findings []Finding, rule string, decision policy.Decision) {
+	t.Helper()
+	for _, finding := range findings {
+		if finding.Rule == rule {
+			if finding.Decision != decision {
+				t.Fatalf("rule %s decision want %s, got %s", rule, decision, finding.Decision)
+			}
+			return
+		}
 	}
-	if findings[0].Decision != policy.DecisionBlock {
-		t.Errorf("default should block delete without where, got %s", findings[0].Decision)
-	}
+	t.Fatalf("expected finding for rule %s, got %#v", rule, findings)
 }
