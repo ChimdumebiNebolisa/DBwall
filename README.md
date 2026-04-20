@@ -19,6 +19,15 @@ It returns one of three decisions:
 - `warn`
 - `block`
 
+## What DBwall Does Not Do
+
+DBwall is a SQL review gate, not a database firewall or a substitute for database permissions.
+
+- It does not execute queries or enforce runtime access control.
+- It does not claim full semantic understanding of every PostgreSQL migration pattern.
+- It does not support non-PostgreSQL dialects.
+- In `core` coverage mode it deliberately keeps reduced advanced-rule coverage rather than pretending parity with the parser-backed path.
+
 Exit codes:
 
 | Code | Meaning |
@@ -39,27 +48,9 @@ Release binaries are built for portability, so they run in `core` mode unless yo
 
 ## Install
 
-### Recommended: release binary
-
-Download a tagged release from GitHub Releases and run the binary directly.
-
-Linux:
-
-```bash
-curl -L -o dbwall.tar.gz https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_linux_amd64.tar.gz
-tar -xzf dbwall.tar.gz
-./dbguard version
-```
-
-Windows PowerShell:
-
-```powershell
-Invoke-WebRequest -Uri https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_windows_amd64.zip -OutFile dbwall.zip
-Expand-Archive dbwall.zip -DestinationPath .
-.\dbguard.exe version
-```
-
 ### Build from source
+
+This is the reliable install path for the current repo state.
 
 Portable build:
 
@@ -79,6 +70,25 @@ CGO_ENABLED=1 go build -o dbguard ./cmd/dbguard
 
 ```bash
 go install github.com/ChimdumebiNebolisa/DBwall/cmd/dbguard@latest
+```
+
+### Tagged release binaries
+
+Release archives are produced by [.github/workflows/release.yml](.github/workflows/release.yml) when a semver tag such as `v0.2.0` is pushed. Use the GitHub Releases page for the currently published version instead of hardcoding a version string from the README.
+
+## Quick Start
+
+Build the CLI and review one statement:
+
+```bash
+go build -o dbguard ./cmd/dbguard
+./dbguard review-sql "DELETE FROM users;"
+```
+
+Review a file with policy and machine-readable output:
+
+```bash
+./dbguard review-file ./migrations/latest.sql --policy ./examples/dbguard.yaml --format json
 ```
 
 ## Usage
@@ -182,7 +192,22 @@ Saved artifacts:
 - Raw benchmark results: [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json)
 - Human-readable report: [benchmark/reports/benchmark_report.md](benchmark/reports/benchmark_report.md)
 
-Benchmark summaries should be taken from those saved artifacts, not from README text.
+Current saved run from [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json):
+
+- Corpus: `benchmark/manifest.json`
+- Coverage mode: `core`
+- Total cases: `9`
+- Correct blocks: `3`
+- Correct allows: `3`
+- Correct warns: `3`
+- False positives: `0`
+- False negatives: `0`
+- Precision (`block` as positive class): `1.0000`
+- Recall (`block` as positive class): `1.0000`
+- Accuracy (exact decision match): `1.0000`
+- Average runtime per case: `91.973 ms`
+
+Those numbers are measured results from the saved artifact, not a generalized product claim. Precision and recall use `block` as the positive class, and the run above reflects the fallback `core` coverage mode shown in the artifact.
 
 ## Local Development
 

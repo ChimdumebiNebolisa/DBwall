@@ -11,7 +11,7 @@
 - Precision (`block` as positive class): `1.0000`
 - Recall (`block` as positive class): `1.0000`
 - Accuracy (exact decision match): `1.0000`
-- Average runtime per case: `85.007 ms`
+- Average runtime per case: `91.973 ms`
 
 ## Assumptions and Definitions
 
@@ -23,12 +23,12 @@
 
 | ID | Category | Expected | Actual | Exact Match | Runtime (ms) |
 | --- | --- | --- | --- | --- | ---: |
-| allow_safe_insert | benign | allow | allow | true | 77.323 |
-| allow_scoped_update | benign | allow | allow | true | 76.932 |
-| allow_select_constant | benign | allow | allow | true | 77.019 |
-| block_delete_without_where | dangerous | block | block | true | 85.028 |
-| block_grant_public_protected | dangerous | block | block | true | 81.138 |
-| block_truncate_table | dangerous | block | block | true | 80.554 |
-| borderline_protected_select_star_limit | borderline | warn | warn | true | 115.361 |
-| borderline_protected_select_without_limit | borderline | warn | warn | true | 99.266 |
-| borderline_protected_update | borderline | warn | warn | true | 72.443 |
+| allow_safe_insert | benign | allow | allow | true | 82.823 |
+| allow_scoped_update | benign | allow | allow | true | 83.757 |
+| allow_select_constant | benign | allow | allow | true | 79.899 |
+| block_delete_without_where | dangerous | block | block | true | 81.760 |
+| block_grant_public_protected | dangerous | block | block | true | 89.855 |
+| block_truncate_table | dangerous | block | block | true | 104.232 |
+| borderline_protected_select_star_limit | borderline | warn | warn | true | 93.384 |
+| borderline_protected_select_without_limit | borderline | warn | warn | true | 90.216 |
+| borderline_protected_update | borderline | warn | warn | true | 121.832 |
