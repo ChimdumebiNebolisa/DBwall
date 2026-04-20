@@ -1,33 +1,45 @@
 # DBwall
 
-**PostgreSQL-first SQL security gate for AI-generated queries, migrations, and workflow automation.**
+**PostgreSQL-first SQL security gate for AI-generated queries, migrations, and automation workflows.**
 
-DBwall reviews PostgreSQL SQL before it reaches a database or merge target. It stays intentionally PostgreSQL-focused and blocks or warns on destructive DDL/DML, risky permission changes, and suspicious bulk-access patterns. It is designed for local developer workflows, CI, and security tooling integrations.
+DBwall reviews PostgreSQL SQL before it reaches a database or merge target. It is intentionally PostgreSQL-only and focuses on high-risk statements: destructive DDL/DML, risky privilege changes, and suspicious bulk-access patterns. The repository is named `DBwall`; the CLI binary is `dbguard`.
 
-## What DBwall checks
+## Why DBwall
 
-DBwall keeps a PostgreSQL-only rule set instead of diluting coverage across multiple dialects.
+AI-generated SQL is often syntactically valid but operationally unsafe. DBwall is meant to catch statements such as:
 
-Current rule categories:
+- unbounded `DELETE` and `UPDATE`
+- destructive schema operations like `DROP TABLE`, `DROP SCHEMA`, and safety-boundary removal
+- privilege expansion such as `GRANT ... TO PUBLIC`
+- suspicious reads or exports from protected objects
 
-- Destructive DML: `delete_without_where`, `delete_trivial_where`, `update_without_where`, `update_trivial_where`, `truncate_table`
-- Destructive DDL: `drop_table`, `drop_schema`, `drop_database`, `drop_column`, `alter_table_drop_not_null_or_constraint`
-- Permissions: `grant_to_public_on_protected_objects`, `alter_default_privileges_public`, `grant_high_risk_role_membership`
-- Protected object handling: `writes_to_protected_tables`
-- Bulk access: `select_all_from_protected_table`, `select_without_limit_from_protected_table`, `copy_to_stdout_or_program_from_protected_source`
+It returns one of three decisions:
 
-## Coverage modes
+- `allow`
+- `warn`
+- `block`
 
-DBwall has two explicit coverage modes:
+Exit codes:
 
-- `full`: parser-backed PostgreSQL validation when built with `CGO_ENABLED=1`
+| Code | Meaning |
+| --- | --- |
+| `0` | Allow |
+| `1` | Tool or parse error |
+| `2` | Warn |
+| `3` | Block |
+
+## Coverage Modes
+
+DBwall reports its parser coverage mode explicitly:
+
+- `full`: PostgreSQL parser-backed validation when built with `CGO_ENABLED=1`
 - `core`: portable fallback mode with reduced advanced-rule coverage
 
-DBwall reports the current coverage mode in JSON output and in human-readable summaries. Release binaries are built in `core` mode for portability. If you want full PostgreSQL parser-backed coverage, build from source with CGO enabled.
+Release binaries are built for portability, so they run in `core` mode unless you build from source with CGO enabled.
 
 ## Install
 
-### Recommended: tagged release binaries
+### Recommended: release binary
 
 Download a tagged release from GitHub Releases and run the binary directly.
 
@@ -35,14 +47,6 @@ Linux:
 
 ```bash
 curl -L -o dbwall.tar.gz https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_linux_amd64.tar.gz
-tar -xzf dbwall.tar.gz
-./dbguard version
-```
-
-macOS:
-
-```bash
-curl -L -o dbwall.tar.gz https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_darwin_arm64.tar.gz
 tar -xzf dbwall.tar.gz
 ./dbguard version
 ```
@@ -55,9 +59,9 @@ Expand-Archive dbwall.zip -DestinationPath .
 .\dbguard.exe version
 ```
 
-### Source build
+### Build from source
 
-Portable core-mode build:
+Portable build:
 
 ```bash
 git clone https://github.com/ChimdumebiNebolisa/DBwall.git
@@ -65,7 +69,7 @@ cd DBwall
 go build -o dbguard ./cmd/dbguard
 ```
 
-Full parser-backed build:
+Full PostgreSQL parser-backed build:
 
 ```bash
 CGO_ENABLED=1 go build -o dbguard ./cmd/dbguard
@@ -103,24 +107,23 @@ Version:
 dbguard version
 ```
 
-Exit codes:
+## Output Modes
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Allow |
-| `1` | Tool or parse error |
-| `2` | Warn |
-| `3` | Block |
+- `human`: concise summary, per-statement findings, rationale, remediation, and coverage-mode note
+- `json`: stable machine-readable output with decision, severity, summary, tool/version metadata, and finding details
+- `sarif`: code-scanning output for GitHub and similar tooling
 
-## Output modes
+## Policy
 
-- `human`: summary counts, per-statement findings, rationale, remediation, and coverage-mode note
-- `json`: stable machine-readable output with legacy fields preserved and extended metadata including `tool`, `version`, `summary`, `generated_at`, and `coverage_mode`
-- `sarif`: code-scanning oriented output suitable for GitHub and similar tooling
+DBwall stays additive and PostgreSQL-specific. The policy file supports:
 
-## Policy file
+- `dialect`
+- `protected_tables`
+- `protected_schemas`
+- `protected_roles`
+- per-rule `allow|warn|block` overrides in `rules`
 
-Policy remains additive and PostgreSQL-specific:
+Example:
 
 ```yaml
 dialect: postgres
@@ -128,67 +131,60 @@ dialect: postgres
 protected_tables:
   - users
   - payments
-  - audit_logs
 
 protected_schemas:
   - finance
-  - admin
 
 protected_roles:
   - pg_read_all_data
-  - platform_admin
 
 rules:
   delete_without_where: block
-  delete_trivial_where: block
-  update_without_where: block
-  update_trivial_where: block
   truncate_table: block
-  drop_table: block
-  drop_schema: block
-  drop_database: block
-  drop_column: block
-  alter_table_drop_not_null_or_constraint: block
   writes_to_protected_tables: warn
-  grant_to_public_on_protected_objects: block
-  alter_default_privileges_public: block
-  grant_high_risk_role_membership: block
-  select_all_from_protected_table: warn
   select_without_limit_from_protected_table: warn
-  copy_to_stdout_or_program_from_protected_source: block
 ```
 
-See [examples/dbguard.yaml](examples/dbguard.yaml).
+Full example: [examples/dbguard.yaml](examples/dbguard.yaml)
 
-## Workflow integration
+## Integrations
 
-- GitHub Actions example: [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md)
-- Pre-commit example: [examples/PRE_COMMIT_EXAMPLE.md](examples/PRE_COMMIT_EXAMPLE.md)
-- Generic CI example: [examples/CI_EXAMPLE.md](examples/CI_EXAMPLE.md)
+- GitHub Actions: [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md)
+- Pre-commit: [examples/PRE_COMMIT_EXAMPLE.md](examples/PRE_COMMIT_EXAMPLE.md)
+- Generic CI: [examples/CI_EXAMPLE.md](examples/CI_EXAMPLE.md)
 
-## Release and CI story
+Repo workflows:
 
-- CI validates both `full` and `core` modes where practical and runs `go vet`, `staticcheck`, and `govulncheck`
-- Tagged releases build Linux, macOS, and Windows archives with checksums
-- Release builds inject version metadata through `ldflags`
+- CI: [.github/workflows/ci.yml](.github/workflows/ci.yml)
+- Release: [.github/workflows/release.yml](.github/workflows/release.yml)
 
-Relevant workflows:
+## Test Corpus
 
-- [ci.yml](.github/workflows/ci.yml)
-- [release.yml](.github/workflows/release.yml)
-
-## Test corpus
-
-DBwall includes an adversarial corpus under `test_e2e/testdata/corpus.json` with:
+DBwall includes an adversarial corpus under [test_e2e/testdata/corpus.json](test_e2e/testdata/corpus.json) covering:
 
 - good queries
 - borderline queries
 - obviously dangerous queries
 - false-positive cases
 
-The corpus is exercised in automated tests alongside parser, rules, report, and CLI end-to-end coverage.
+## Benchmark
 
-## Local development
+The reproducible benchmark harness lives under `benchmark/`.
+
+Run it from the repo root:
+
+```bash
+go run ./benchmark/cmd/dbwallbench --repo-root . --manifest ./benchmark/manifest.json --json-out ./benchmark/results/benchmark_results.json --report-out ./benchmark/reports/benchmark_report.md
+```
+
+Saved artifacts:
+
+- Raw benchmark results: [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json)
+- Human-readable report: [benchmark/reports/benchmark_report.md](benchmark/reports/benchmark_report.md)
+
+Benchmark summaries should be taken from those saved artifacts, not from README text.
+
+## Local Development
 
 ```bash
 go test ./...
