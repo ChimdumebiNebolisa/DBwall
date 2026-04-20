@@ -39,7 +39,7 @@ func reviewSQLCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&policyPath, "policy", "", "Path to policy YAML file")
-	cmd.Flags().StringVar(&format, "format", "human", "Output format: human or json")
+	cmd.Flags().StringVar(&format, "format", "human", "Output format: human, json, or sarif")
 	return cmd
 }
 
@@ -57,7 +57,7 @@ func reviewFileCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&policyPath, "policy", "", "Path to policy YAML file")
-	cmd.Flags().StringVar(&format, "format", "human", "Output format: human or json")
+	cmd.Flags().StringVar(&format, "format", "human", "Output format: human, json, or sarif")
 	return cmd
 }
 

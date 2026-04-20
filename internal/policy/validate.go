@@ -3,27 +3,23 @@ package policy
 import (
 	"errors"
 	"fmt"
+
+	"github.com/ChimdumebiNebolisa/DBwall/internal/rulemeta"
 )
 
 // ErrUnsupportedDialect is returned when dialect is not postgres.
 var ErrUnsupportedDialect = errors.New("unsupported dialect: only postgres is supported in v1")
 
 // ValidRuleNames is the set of rule names that may appear in policy.
-var ValidRuleNames = []string{
-	RuleDeleteWithoutWhere,
-	RuleUpdateWithoutWhere,
-	RuleDropTable,
-	RuleDropColumn,
-	RuleWritesToProtectedTable,
-}
+var ValidRuleNames = rulemeta.IDs()
 
-var validRuleNamesMap = map[string]bool{
-	RuleDeleteWithoutWhere:     true,
-	RuleUpdateWithoutWhere:     true,
-	RuleDropTable:              true,
-	RuleDropColumn:             true,
-	RuleWritesToProtectedTable: true,
-}
+var validRuleNamesMap = func() map[string]bool {
+	out := make(map[string]bool, len(ValidRuleNames))
+	for _, name := range ValidRuleNames {
+		out[name] = true
+	}
+	return out
+}()
 
 // ValidDecisions are allowed values for rule actions.
 var ValidDecisions = map[string]bool{

@@ -32,7 +32,7 @@ func ReviewSQL(sql string, policyPath string, format string) int {
 		return ExitError
 	}
 	res := analyzer.Analyze(stmts, p)
-	return printAndExit(res, format)
+	return printAndExit(res, format, report.Options{CoverageMode: parser.CoverageMode()})
 }
 
 // ReviewFile runs the full review pipeline on a SQL file and prints output.
@@ -42,7 +42,24 @@ func ReviewFile(filePath string, policyPath string, format string) int {
 		fmt.Fprintln(os.Stderr, "read file:", err)
 		return ExitError
 	}
-	return ReviewSQL(string(data), policyPath, format)
+	p, err := loadPolicy(policyPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "policy:", err)
+		return ExitError
+	}
+	stmts, err := parser.Parse(string(data))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "parse:", err)
+		return ExitError
+	}
+	res := analyzer.Analyze(stmts, p)
+	for i := range res.Statements {
+		res.Statements[i].Location = &analyzer.SourceLocation{
+			Path:      filePath,
+			StartLine: res.Statements[i].StartLine,
+		}
+	}
+	return printAndExit(res, format, report.Options{SourcePath: filePath, CoverageMode: parser.CoverageMode()})
 }
 
 func loadPolicy(path string) (*policy.Policy, error) {
@@ -59,17 +76,24 @@ func loadPolicy(path string) (*policy.Policy, error) {
 	return p, nil
 }
 
-func printAndExit(res *analyzer.Result, format string) int {
+func printAndExit(res *analyzer.Result, format string, opts report.Options) int {
 	var out string
 	var err error
-	if format == "json" {
-		out, err = report.JSON(res)
+	switch format {
+	case "json":
+		out, err = report.JSON(res, opts)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return ExitError
 		}
-	} else {
-		out = report.Human(res)
+	case "sarif":
+		out, err = report.SARIF(res, opts)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return ExitError
+		}
+	default:
+		out = report.Human(res, opts)
 	}
 	fmt.Println(out)
 	return decisionToExit(res.Decision)

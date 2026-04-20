@@ -2,4 +2,6 @@
 package version
 
 // Version is the semantic version of dbguard.
-const Version = "0.1.0"
+// It can be overridden at build time with:
+// -ldflags "-X github.com/ChimdumebiNebolisa/DBwall/internal/version.Version=vX.Y.Z"
+var Version = "0.2.0-dev"

@@ -2,6 +2,12 @@
 // and rule action lookup.
 package policy
 
+import (
+	"strings"
+
+	"github.com/ChimdumebiNebolisa/DBwall/internal/rulemeta"
+)
+
 // Dialect is the SQL dialect. v1 supports only postgres.
 type Dialect string
 
@@ -20,32 +26,46 @@ const (
 
 // Rule names used in policy and rules package.
 const (
-	RuleDeleteWithoutWhere     = "delete_without_where"
-	RuleUpdateWithoutWhere     = "update_without_where"
-	RuleDropTable              = "drop_table"
-	RuleDropColumn             = "drop_column"
-	RuleWritesToProtectedTable = "writes_to_protected_tables"
+	RuleDeleteWithoutWhere          = rulemeta.RuleDeleteWithoutWhere
+	RuleUpdateWithoutWhere          = rulemeta.RuleUpdateWithoutWhere
+	RuleDropTable                   = rulemeta.RuleDropTable
+	RuleDropColumn                  = rulemeta.RuleDropColumn
+	RuleWritesToProtectedTable      = rulemeta.RuleWritesToProtectedTable
+	RuleDeleteTrivialWhere          = rulemeta.RuleDeleteTrivialWhere
+	RuleUpdateTrivialWhere          = rulemeta.RuleUpdateTrivialWhere
+	RuleTruncateTable               = rulemeta.RuleTruncateTable
+	RuleDropSchema                  = rulemeta.RuleDropSchema
+	RuleDropDatabase                = rulemeta.RuleDropDatabase
+	RuleAlterDropSafetyConstraint   = rulemeta.RuleAlterDropSafetyConstraint
+	RuleGrantToPublicProtected      = rulemeta.RuleGrantToPublicProtected
+	RuleAlterDefaultPrivileges      = rulemeta.RuleAlterDefaultPrivileges
+	RuleGrantHighRiskRoleMembership = rulemeta.RuleGrantHighRiskRoleMembership
+	RuleSelectAllProtectedTable     = rulemeta.RuleSelectAllProtectedTable
+	RuleSelectWithoutLimitProtected = rulemeta.RuleSelectWithoutLimitProtected
+	RuleCopyToStdoutOrProgram       = rulemeta.RuleCopyToStdoutOrProgram
 )
 
 // Policy holds dialect, protected tables, and per-rule decisions.
 type Policy struct {
-	Dialect         Dialect           `yaml:"dialect"`
-	ProtectedTables []string          `yaml:"protected_tables"`
-	Rules           map[string]string `yaml:"rules"` // rule name -> "allow"|"warn"|"block"
+	Dialect          Dialect           `yaml:"dialect" json:"dialect"`
+	ProtectedTables  []string          `yaml:"protected_tables" json:"protected_tables"`
+	ProtectedSchemas []string          `yaml:"protected_schemas" json:"protected_schemas"`
+	ProtectedRoles   []string          `yaml:"protected_roles" json:"protected_roles"`
+	Rules            map[string]string `yaml:"rules" json:"rules"` // rule name -> "allow"|"warn"|"block"
 }
 
 // DefaultPolicy returns the built-in v1 default policy.
 func DefaultPolicy() *Policy {
+	defaults := map[string]string{}
+	for _, ruleID := range rulemeta.IDs() {
+		defaults[ruleID] = rulemeta.MustGet(ruleID).DefaultDecision
+	}
 	return &Policy{
-		Dialect:         DialectPostgres,
-		ProtectedTables: nil,
-		Rules: map[string]string{
-			RuleDeleteWithoutWhere:     string(DecisionBlock),
-			RuleUpdateWithoutWhere:     string(DecisionBlock),
-			RuleDropTable:              string(DecisionBlock),
-			RuleDropColumn:             string(DecisionBlock),
-			RuleWritesToProtectedTable: string(DecisionWarn),
-		},
+		Dialect:          DialectPostgres,
+		ProtectedTables:  nil,
+		ProtectedSchemas: nil,
+		ProtectedRoles:   nil,
+		Rules:            defaults,
 	}
 }
 
@@ -71,25 +91,85 @@ func (p *Policy) RuleDecision(ruleName string) Decision {
 }
 
 func defaultDecisionForRule(ruleName string) Decision {
-	switch ruleName {
-	case RuleDeleteWithoutWhere, RuleUpdateWithoutWhere, RuleDropTable, RuleDropColumn:
-		return DecisionBlock
-	case RuleWritesToProtectedTable:
-		return DecisionWarn
-	default:
-		return DecisionWarn
+	if rule, ok := rulemeta.Get(ruleName); ok {
+		return Decision(rule.DefaultDecision)
 	}
+	return DecisionWarn
 }
 
-// IsProtectedTable returns true if tableName is in the protected list (exact match, case-sensitive in v1).
+// IsProtectedTable returns true if tableName is explicitly protected or its schema is protected.
 func (p *Policy) IsProtectedTable(tableName string) bool {
-	if p == nil || len(p.ProtectedTables) == 0 {
+	if p == nil {
 		return false
 	}
+	name := normalizeName(tableName)
+	if name == "" {
+		return false
+	}
+	leaf := name
+	if idx := strings.LastIndex(name, "."); idx >= 0 {
+		leaf = name[idx+1:]
+	}
 	for _, t := range p.ProtectedTables {
-		if t == tableName {
+		protected := normalizeName(t)
+		if protected == name || protected == leaf {
+			return true
+		}
+	}
+	return p.IsProtectedSchema(schemaFromName(name))
+}
+
+// IsProtectedSchema returns true when a schema is marked protected.
+func (p *Policy) IsProtectedSchema(schema string) bool {
+	if p == nil {
+		return false
+	}
+	name := normalizeName(schema)
+	if name == "" {
+		return false
+	}
+	for _, s := range p.ProtectedSchemas {
+		if normalizeName(s) == name {
 			return true
 		}
 	}
 	return false
+}
+
+// IsProtectedRole returns true when a role is marked protected.
+func (p *Policy) IsProtectedRole(role string) bool {
+	if p == nil {
+		return false
+	}
+	name := normalizeName(role)
+	if name == "" {
+		return false
+	}
+	for _, r := range p.ProtectedRoles {
+		if normalizeName(r) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func normalizeName(name string) string {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return ""
+	}
+	parts := strings.Split(name, ".")
+	for i, part := range parts {
+		part = strings.TrimSpace(part)
+		part = strings.Trim(part, `"`)
+		parts[i] = strings.ToLower(part)
+	}
+	return strings.Join(parts, ".")
+}
+
+func schemaFromName(name string) string {
+	if idx := strings.LastIndex(name, "."); idx >= 0 {
+		return name[:idx]
+	}
+	return ""
 }

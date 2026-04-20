@@ -17,23 +17,46 @@ const (
 
 // Finding is one rule trigger for a statement.
 type Finding struct {
-	Rule     string
-	Severity Severity
-	Decision policy.Decision
-	Message  string
+	Rule           string
+	Title          string
+	Category       string
+	Severity       Severity
+	Decision       policy.Decision
+	Message        string
+	Rationale      string
+	Remediation    string
+	StatementIndex int
+}
+
+// SourceLocation describes where a statement originated in a source file.
+type SourceLocation struct {
+	Path      string `json:"path,omitempty"`
+	StartLine int    `json:"start_line,omitempty"`
 }
 
 // StatementResult holds the analysis result for one statement.
 type StatementResult struct {
-	Index    int
-	Type     string
-	Table    string
-	Findings []Finding
+	Index     int
+	Type      string
+	Table     string
+	Object    string
+	StartLine int
+	Location  *SourceLocation
+	Findings  []Finding
+}
+
+// Summary captures the overall finding counts.
+type Summary struct {
+	Statements int
+	Findings   int
+	Blocks     int
+	Warnings   int
 }
 
 // Result is the full analysis result.
 type Result struct {
 	Decision   policy.Decision
 	Severity   Severity
+	Summary    Summary
 	Statements []StatementResult
 }
