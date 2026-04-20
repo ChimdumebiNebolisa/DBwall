@@ -8,7 +8,17 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cgo_enabled: "1"
+            coverage_mode: full
+          - os: windows-latest
+            cgo_enabled: "0"
+            coverage_mode: core
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -20,10 +30,33 @@ jobs:
       - name: Build
         run: go build -v ./cmd/dbguard
         env:
-          CGO_ENABLED: 1
+          CGO_ENABLED: ${{ matrix.cgo_enabled }}
 
       - name: Test
         run: go test -v -count=1 ./...
         env:
-          CGO_ENABLED: 1
-        timeout-minutes: 10
+          CGO_ENABLED: ${{ matrix.cgo_enabled }}
+
+  security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Install analyzers
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: staticcheck
+        run: staticcheck ./...
+
+      - name: govulncheck
+        run: govulncheck ./...

@@ -1,66 +1,126 @@
 # DBwall
 
-**Go CLI that reviews AI-generated PostgreSQL SQL and blocks unsafe operations before execution.**
+**PostgreSQL-first SQL security gate for AI-generated queries, migrations, and workflow automation.**
 
-dbguard checks generated SQL before it reaches a database. It focuses on a small set of high-risk PostgreSQL operations such as full-table deletes, full-table updates, `DROP TABLE`, `ALTER TABLE ... DROP COLUMN`, and writes against protected tables. The CLI returns a simple `allow`, `warn`, or `block` decision that works cleanly in local workflows and CI.
+DBwall reviews PostgreSQL SQL before it reaches a database or merge target. It stays intentionally PostgreSQL-focused and blocks or warns on destructive DDL/DML, risky permission changes, and suspicious bulk-access patterns. It is designed for local developer workflows, CI, and security tooling integrations.
 
-## Why this exists
+## What DBwall checks
 
-AI-generated SQL often looks plausible while still being destructive. A missing `WHERE` clause or schema-changing statement can cause real data loss. dbguard adds a fast local review step before execution or merge.
+DBwall keeps a PostgreSQL-only rule set instead of diluting coverage across multiple dialects.
 
-## Parsing behavior
+Current rule categories:
 
-- With `CGO_ENABLED=1`, dbguard uses `pg_query_go` for PostgreSQL parser-backed analysis.
-- Without CGO, dbguard uses a built-in cross-platform parser that covers the current v1 rule set on Windows, macOS, and Linux.
-- The supported v1 checks are exercised by the automated test suite in both CLI and parser-level tests.
+- Destructive DML: `delete_without_where`, `delete_trivial_where`, `update_without_where`, `update_trivial_where`, `truncate_table`
+- Destructive DDL: `drop_table`, `drop_schema`, `drop_database`, `drop_column`, `alter_table_drop_not_null_or_constraint`
+- Permissions: `grant_to_public_on_protected_objects`, `alter_default_privileges_public`, `grant_high_risk_role_membership`
+- Protected object handling: `writes_to_protected_tables`
+- Bulk access: `select_all_from_protected_table`, `select_without_limit_from_protected_table`, `copy_to_stdout_or_program_from_protected_source`
 
-## v1 features
+## Coverage modes
 
-| Feature | Description |
-| --- | --- |
-| `DELETE` without `WHERE` | Block by default |
-| `UPDATE` without `WHERE` | Block by default |
-| `DROP TABLE` | Block by default |
-| `ALTER TABLE ... DROP COLUMN` | Block by default |
-| Writes to protected tables | Warn by default |
-| Decisions | `allow`, `warn`, `block` |
-| Exit codes | `0` allow, `1` error, `2` warn, `3` block |
+DBwall has two explicit coverage modes:
 
-## Installation
+- `full`: parser-backed PostgreSQL validation when built with `CGO_ENABLED=1`
+- `core`: portable fallback mode with reduced advanced-rule coverage
 
-Requires **Go 1.21+**.
+DBwall reports the current coverage mode in JSON output and in human-readable summaries. Release binaries are built in `core` mode for portability. If you want full PostgreSQL parser-backed coverage, build from source with CGO enabled.
+
+## Install
+
+### Recommended: tagged release binaries
+
+Download a tagged release from GitHub Releases and run the binary directly.
+
+Linux:
+
+```bash
+curl -L -o dbwall.tar.gz https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_linux_amd64.tar.gz
+tar -xzf dbwall.tar.gz
+./dbguard version
+```
+
+macOS:
+
+```bash
+curl -L -o dbwall.tar.gz https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_darwin_arm64.tar.gz
+tar -xzf dbwall.tar.gz
+./dbguard version
+```
+
+Windows PowerShell:
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/ChimdumebiNebolisa/DBwall/releases/download/v0.2.0/dbguard_v0.2.0_windows_amd64.zip -OutFile dbwall.zip
+Expand-Archive dbwall.zip -DestinationPath .
+.\dbguard.exe version
+```
+
+### Source build
+
+Portable core-mode build:
 
 ```bash
 git clone https://github.com/ChimdumebiNebolisa/DBwall.git
 cd DBwall
-go mod tidy
 go build -o dbguard ./cmd/dbguard
 ```
 
-If you want the PostgreSQL parser-backed path, build with `CGO_ENABLED=1` and a working C toolchain.
+Full parser-backed build:
 
-On Windows the binary will be `dbguard.exe`; use `.\dbguard.exe` in examples below if needed.
+```bash
+CGO_ENABLED=1 go build -o dbguard ./cmd/dbguard
+```
+
+### Go install
+
+```bash
+go install github.com/ChimdumebiNebolisa/DBwall/cmd/dbguard@latest
+```
 
 ## Usage
 
+Human-readable review:
+
 ```bash
 dbguard review-sql "DELETE FROM users;"
-dbguard review-sql "SELECT 1;" --format json
-dbguard review-file ./examples/protected_table_update.sql --policy ./examples/dbguard.yaml
+```
+
+JSON for automation:
+
+```bash
+dbguard review-file ./migrations/latest.sql --policy ./dbguard.yaml --format json
+```
+
+SARIF for code scanning:
+
+```bash
+dbguard review-file ./migrations/latest.sql --policy ./dbguard.yaml --format sarif > dbwall.sarif
+```
+
+Version:
+
+```bash
 dbguard version
 ```
 
-### Expected decisions
+Exit codes:
 
-`DELETE FROM users;` returns `BLOCK` with exit code `3`.
+| Code | Meaning |
+| --- | --- |
+| `0` | Allow |
+| `1` | Tool or parse error |
+| `2` | Warn |
+| `3` | Block |
 
-`SELECT 1; --format json` returns `ALLOW` with exit code `0`.
+## Output modes
 
-`UPDATE users SET role = 'viewer' WHERE id = 1;` with `users` in `protected_tables` returns `WARN` with exit code `2`.
+- `human`: summary counts, per-statement findings, rationale, remediation, and coverage-mode note
+- `json`: stable machine-readable output with legacy fields preserved and extended metadata including `tool`, `version`, `summary`, `generated_at`, and `coverage_mode`
+- `sarif`: code-scanning oriented output suitable for GitHub and similar tooling
 
 ## Policy file
 
-If no policy file is provided, built-in defaults are used.
+Policy remains additive and PostgreSQL-specific:
 
 ```yaml
 dialect: postgres
@@ -70,45 +130,70 @@ protected_tables:
   - payments
   - audit_logs
 
+protected_schemas:
+  - finance
+  - admin
+
+protected_roles:
+  - pg_read_all_data
+  - platform_admin
+
 rules:
   delete_without_where: block
+  delete_trivial_where: block
   update_without_where: block
+  update_trivial_where: block
+  truncate_table: block
   drop_table: block
+  drop_schema: block
+  drop_database: block
   drop_column: block
+  alter_table_drop_not_null_or_constraint: block
   writes_to_protected_tables: warn
+  grant_to_public_on_protected_objects: block
+  alter_default_privileges_public: block
+  grant_high_risk_role_membership: block
+  select_all_from_protected_table: warn
+  select_without_limit_from_protected_table: warn
+  copy_to_stdout_or_program_from_protected_source: block
 ```
 
 See [examples/dbguard.yaml](examples/dbguard.yaml).
 
-## Exit codes
+## Workflow integration
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Allow |
-| `1` | Internal or tool error |
-| `2` | Warn |
-| `3` | Block |
+- GitHub Actions example: [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md)
+- Pre-commit example: [examples/PRE_COMMIT_EXAMPLE.md](examples/PRE_COMMIT_EXAMPLE.md)
+- Generic CI example: [examples/CI_EXAMPLE.md](examples/CI_EXAMPLE.md)
 
-## Limitations
+## Release and CI story
 
-- PostgreSQL-focused only.
-- No semantic predicate analysis. `DELETE FROM users WHERE 1=1` still counts as having a `WHERE` clause.
-- The non-CGO parser is intentionally scoped to the current v1 checks.
+- CI validates both `full` and `core` modes where practical and runs `go vet`, `staticcheck`, and `govulncheck`
+- Tagged releases build Linux, macOS, and Windows archives with checksums
+- Release builds inject version metadata through `ldflags`
+
+Relevant workflows:
+
+- [ci.yml](.github/workflows/ci.yml)
+- [release.yml](.github/workflows/release.yml)
+
+## Test corpus
+
+DBwall includes an adversarial corpus under `test_e2e/testdata/corpus.json` with:
+
+- good queries
+- borderline queries
+- obviously dangerous queries
+- false-positive cases
+
+The corpus is exercised in automated tests alongside parser, rules, report, and CLI end-to-end coverage.
 
 ## Local development
 
 ```bash
-go build ./cmd/dbguard
 go test ./...
-go fmt ./...
 go vet ./...
 ```
-
-## CI
-
-This repo includes CI for build and test coverage on pushes and pull requests. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
-
-For a GitHub Actions usage example, see [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md).
 
 ## License
 
