@@ -76,6 +76,30 @@ func TestCheck_CoreModeReasonDoesNotFireIncomplete(t *testing.T) {
 	}
 }
 
+func TestCheck_AlterDropColumnAndConstraint(t *testing.T) {
+	stmt := parser.Statement{
+		Type:           parser.StmtTypeAlterTableDropCol,
+		Table:          "t1",
+		DropColumn:     true,
+		DropConstraint: true,
+	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleDropColumn, policy.DecisionBlock)
+	requireRuleDecision(t, findings, policy.RuleAlterDropSafetyConstraint, policy.DecisionBlock)
+}
+
+func TestCheck_IncompletePredicateEscalatesOnDelete(t *testing.T) {
+	stmt := parser.Statement{
+		Type:              parser.StmtTypeDelete,
+		Table:             "users",
+		HasWhere:          true,
+		Completeness:      parser.AnalysisPartial,
+		IncompleteReasons: []string{"predicate_classification_unknown"},
+	}
+	findings := Check(stmt, policy.DefaultPolicy())
+	requireRuleDecision(t, findings, policy.RuleSemanticAnalysisIncomplete, policy.DecisionBlock)
+}
+
 func TestCheck_NestedDeleteRules(t *testing.T) {
 	stmt := parser.Statement{
 		Type: parser.StmtTypeSelect,
@@ -91,3 +115,4 @@ func TestCheck_NestedDeleteRules(t *testing.T) {
 	findings := Check(stmt, policy.DefaultPolicy())
 	requireRuleDecision(t, findings, policy.RuleDeleteWithoutWhere, policy.DecisionBlock)
 }
+

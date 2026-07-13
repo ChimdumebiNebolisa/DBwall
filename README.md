@@ -214,7 +214,7 @@ Current saved run from [benchmark/results/benchmark_results.json](benchmark/resu
 - Precision (`block` as positive class): `1.0000`
 - Recall (`block` as positive class): `1.0000`
 - Accuracy (exact decision match): `1.0000`
-- Average runtime per case: `4.481 ms`
+- Average runtime per case: `4.157 ms`
 
 Those numbers are measured results from the saved artifact, not a generalized product claim. Precision and recall use `block` as the positive class. Cases marked `requires_full` are included only when the built binary reports `coverage_mode=full`.
 

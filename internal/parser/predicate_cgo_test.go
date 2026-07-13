@@ -12,6 +12,8 @@ func TestPredicate_AlwaysTrueCases(t *testing.T) {
 		`DELETE FROM users WHERE TRUE OR id = 5;`,
 		`DELETE FROM users WHERE id = 5 OR TRUE;`,
 		`DELETE FROM users WHERE NOT FALSE;`,
+		`DELETE FROM users WHERE 2 > 1;`,
+		`DELETE FROM users WHERE 1 IS NOT DISTINCT FROM 1;`,
 	}
 	for _, sql := range cases {
 		stmts, err := Parse(sql)

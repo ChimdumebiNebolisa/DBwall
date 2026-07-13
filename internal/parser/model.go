@@ -61,12 +61,16 @@ type RelationRef struct {
 	Role   RelationRole
 }
 
-// QualifiedName returns schema.name or name.
+// QualifiedName returns schema.name, schema, or name.
 func (r RelationRef) QualifiedName() string {
-	if r.Schema == "" {
+	switch {
+	case r.Schema != "" && r.Name != "":
+		return r.Schema + "." + r.Name
+	case r.Name != "":
 		return r.Name
+	default:
+		return r.Schema
 	}
-	return r.Schema + "." + r.Name
 }
 
 // Statement is an analyzer-friendly semantic representation of one SQL statement.
@@ -162,7 +166,7 @@ func filterRelations(rels []RelationRef, role RelationRole) []RelationRef {
 func addRelation(stmt *Statement, schema, name string, role RelationRole) {
 	schema = strings.TrimSpace(schema)
 	name = strings.TrimSpace(name)
-	if name == "" {
+	if name == "" && schema == "" {
 		return
 	}
 	ref := RelationRef{Schema: schema, Name: name, Role: role}
@@ -237,6 +241,15 @@ func syncConvenienceFields(stmt *Statement) {
 		stmt.Completeness = AnalysisComplete
 	}
 
+	switch stmt.Type {
+	case StmtTypeDropSchema, StmtTypeDropDatabase, StmtTypeAlterDefaultPrivileges:
+		// These statements are not table-primary; keep Object/Schema without inventing Table.
+		if stmt.Object == "" && stmt.Schema != "" {
+			stmt.Object = stmt.Schema
+		}
+		return
+	}
+
 	primary := primaryRelation(*stmt)
 	if primary.Name != "" {
 		qual := primary.QualifiedName()
@@ -251,6 +264,15 @@ func syncConvenienceFields(stmt *Statement) {
 			if stmt.Schema == "" {
 				stmt.Schema = relationSchema(qual)
 			}
+		}
+		return
+	}
+	if primary.Schema != "" {
+		if stmt.Object == "" {
+			stmt.Object = primary.Schema
+		}
+		if stmt.Schema == "" {
+			stmt.Schema = primary.Schema
 		}
 	}
 }

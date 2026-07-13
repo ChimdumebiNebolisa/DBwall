@@ -103,6 +103,11 @@ func extractSelectBody(stmt *Statement, node *pg_query.SelectStmt, cteNames map[
 	if node.Op != pg_query.SetOperation_SET_OPERATION_UNDEFINED && node.Op != pg_query.SetOperation_SETOP_NONE {
 		extractSelectBody(stmt, node.Larg, cteNames)
 		extractSelectBody(stmt, node.Rarg, cteNames)
+		// Outer set-operation nodes still own LIMIT / projection metadata.
+		stmt.SelectAll = stmt.SelectAll || selectListHasStar(node.TargetList)
+		if node.LimitCount != nil {
+			stmt.HasLimit = true
+		}
 		return
 	}
 	stmt.SelectAll = selectListHasStar(node.TargetList)
@@ -130,9 +135,10 @@ func extractInsert(stmt *Statement, node *pg_query.InsertStmt) {
 	addRangeVar(stmt, node.Relation, RelationWrite)
 	if node.SelectStmt != nil {
 		if sel := node.SelectStmt.GetSelectStmt(); sel != nil {
-			tmp := Statement{Completeness: AnalysisComplete}
+			tmp := Statement{Completeness: AnalysisComplete, Type: StmtTypeSelect}
 			extractSelectBody(&tmp, sel, nil)
 			mergeSemantic(stmt, tmp)
+			stmt.Nested = append(stmt.Nested, tmp.Nested...)
 		} else {
 			walkNodeRelations(stmt, node.SelectStmt, RelationRead, nil)
 		}
@@ -182,7 +188,7 @@ func extractDrop(stmt *Statement, node *pg_query.DropStmt) {
 			}
 			stmt.Object = name
 			stmt.Schema = name
-			addRelation(stmt, "", name, RelationTarget)
+			addRelation(stmt, name, "", RelationTarget)
 		}
 	default:
 		stmt.Type = StmtTypeOther
@@ -307,7 +313,7 @@ func applyGrantCommon(stmt *Statement, node *pg_query.GrantStmt) {
 			}
 			stmt.Schema = name
 			stmt.Object = name
-			addRelation(stmt, "", name, RelationTarget)
+			addRelation(stmt, name, "", RelationTarget)
 		}
 	default:
 		if node.Targtype == pg_query.GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA {
@@ -316,7 +322,7 @@ func applyGrantCommon(stmt *Statement, node *pg_query.GrantStmt) {
 				if ok {
 					stmt.Schema = name
 					stmt.Object = name
-					addRelation(stmt, "", name, RelationTarget)
+					addRelation(stmt, name, "", RelationTarget)
 				}
 			}
 		} else if len(node.Objects) > 0 {
@@ -331,16 +337,21 @@ func extractCopy(stmt *Statement, node *pg_query.CopyStmt) {
 		markIncomplete(stmt, AnalysisPartial, "missing_copy_node")
 		return
 	}
-	stmt.CopyToProgram = node.IsProgram
+	stmt.CopyToProgram = node.IsProgram && !node.IsFrom
 	stmt.CopyToStdout = !node.IsFrom && !node.IsProgram && node.Filename == ""
 	if node.Relation != nil {
-		addRangeVar(stmt, node.Relation, RelationRead)
+		role := RelationRead
+		if node.IsFrom {
+			role = RelationWrite
+		}
+		addRangeVar(stmt, node.Relation, role)
 	}
 	if node.Query != nil {
 		if sel := node.Query.GetSelectStmt(); sel != nil {
 			tmp := Statement{Completeness: AnalysisComplete, Type: StmtTypeSelect}
 			extractSelectBody(&tmp, sel, nil)
 			mergeSemantic(stmt, tmp)
+			stmt.Nested = append(stmt.Nested, tmp.Nested...)
 		} else {
 			walkNodeRelations(stmt, node.Query, RelationRead, nil)
 			markIncomplete(stmt, AnalysisPartial, "copy_query_unrecognized_shape")
@@ -588,12 +599,8 @@ func mergeSemantic(dst *Statement, src Statement) {
 	for _, rel := range src.Relations {
 		addRelation(dst, rel.Schema, rel.Name, rel.Role)
 	}
-	if src.SelectAll {
-		dst.SelectAll = true
-	}
-	if src.HasLimit {
-		dst.HasLimit = true
-	}
+	// Do not OR SelectAll/HasLimit onto parent statements: those flags describe the
+	// nested statement's own projection/limit and would create false positives/negatives.
 	if src.Completeness == AnalysisUnsupported {
 		markIncomplete(dst, AnalysisUnsupported, firstReason(src))
 	} else if src.Completeness == AnalysisPartial {
@@ -601,8 +608,6 @@ func mergeSemantic(dst *Statement, src Statement) {
 			markIncomplete(dst, AnalysisPartial, reason)
 		}
 	}
-	// Nested mutations: if nested DELETE/UPDATE has absent/trivial predicate metadata,
-	// surface via Nested for rule recursion (already appended by caller).
 }
 
 func firstReason(stmt Statement) string {

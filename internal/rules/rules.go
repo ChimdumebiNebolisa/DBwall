@@ -121,7 +121,12 @@ func checkDropColumn(stmt parser.Statement, p *policy.Policy) *Finding {
 }
 
 func checkAlterDropSafetyConstraint(stmt parser.Statement, p *policy.Policy) *Finding {
-	if stmt.Type != parser.StmtTypeAlterTable || (!stmt.DropConstraint && !stmt.DropNotNull) {
+	if !stmt.DropConstraint && !stmt.DropNotNull {
+		return nil
+	}
+	switch stmt.Type {
+	case parser.StmtTypeAlterTable, parser.StmtTypeAlterTableDropCol:
+	default:
 		return nil
 	}
 	return newFinding(policy.RuleAlterDropSafetyConstraint, p.RuleDecision(policy.RuleAlterDropSafetyConstraint), "ALTER TABLE removes a NOT NULL or table constraint")
@@ -306,7 +311,10 @@ func shouldEscalateIncomplete(stmt parser.Statement) bool {
 	case parser.StmtTypeDelete, parser.StmtTypeUpdate, parser.StmtTypeInsert, parser.StmtTypeTruncate,
 		parser.StmtTypeDropTable, parser.StmtTypeAlterTable, parser.StmtTypeAlterTableDropCol:
 		for _, reason := range stmt.IncompleteReasons {
-			if strings.Contains(reason, "relation") || strings.Contains(reason, "from_item") || strings.Contains(reason, "unsupported") {
+			if strings.Contains(reason, "relation") ||
+				strings.Contains(reason, "from_item") ||
+				strings.Contains(reason, "unsupported") ||
+				strings.Contains(reason, "predicate_classification_unknown") {
 				return true
 			}
 		}

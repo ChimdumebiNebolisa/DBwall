@@ -126,6 +126,76 @@ func TestAST_UnsupportedStatementMarksIncomplete(t *testing.T) {
 	}
 }
 
+func TestAST_CopyFromProgramNotExport(t *testing.T) {
+	stmts, err := Parse(`COPY users FROM PROGRAM 'cat';`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stmts[0].CopyToProgram || stmts[0].CopyToStdout {
+		t.Fatalf("COPY FROM PROGRAM must not look like export: %#v", stmts[0])
+	}
+	if !hasRelation(stmts[0], "users", RelationWrite) {
+		t.Fatalf("expected write relation for COPY FROM, got %#v", stmts[0].Relations)
+	}
+}
+
+func TestAST_DropSchemaDoesNotSetTable(t *testing.T) {
+	stmts, err := Parse(`DROP SCHEMA reporting;`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stmts[0].Table != "" {
+		t.Fatalf("DROP SCHEMA must not invent Table, got %q", stmts[0].Table)
+	}
+	if stmts[0].Object != "reporting" || stmts[0].Schema != "reporting" {
+		t.Fatalf("unexpected object/schema: %#v", stmts[0])
+	}
+}
+
+func TestAST_NestedCTEInsideCopy(t *testing.T) {
+	stmts, err := Parse(`COPY (WITH x AS (DELETE FROM users RETURNING id) SELECT * FROM x) TO STDOUT;`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	foundDelete := false
+	var walk func(Statement)
+	walk = func(s Statement) {
+		if s.Type == StmtTypeDelete && hasRelation(s, "users", RelationWrite) && !s.HasWhere {
+			foundDelete = true
+		}
+		for _, n := range s.Nested {
+			walk(n)
+		}
+	}
+	walk(stmts[0])
+	if !foundDelete {
+		t.Fatalf("expected nested DELETE without WHERE under COPY, got %#v", stmts[0].Nested)
+	}
+}
+
+func TestAST_ParentDoesNotInheritNestedLimit(t *testing.T) {
+	stmts, err := Parse(`WITH c AS (SELECT * FROM users LIMIT 10) SELECT * FROM c;`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stmts[0].HasLimit {
+		t.Fatal("parent SELECT must not inherit CTE HasLimit")
+	}
+}
+
+func TestAST_SetOpOuterLimit(t *testing.T) {
+	stmts, err := Parse(`SELECT * FROM users UNION ALL SELECT * FROM orders LIMIT 10;`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !stmts[0].HasLimit {
+		t.Fatal("set-op outer LIMIT must be recognized")
+	}
+	if !containsAll(stmts[0].AllRelationNames(), "users", "orders") {
+		t.Fatalf("unexpected relations: %#v", stmts[0].Relations)
+	}
+}
+
 func TestAST_QuotedAndSchemaQualified(t *testing.T) {
 	stmts, err := Parse(`SELECT id FROM public."Users";`)
 	if err != nil {
@@ -141,6 +211,7 @@ func TestAST_QuotedAndSchemaQualified(t *testing.T) {
 		t.Fatalf("expected public.Users read, got %#v", stmts[0].Relations)
 	}
 }
+
 
 func hasRelation(stmt Statement, name string, role RelationRole) bool {
 	for _, rel := range stmt.Relations {

@@ -203,9 +203,49 @@ func evalAExpr(expr *pg_query.A_Expr) constValue {
 	if expr == nil {
 		return unknownValue()
 	}
-	if expr.Kind != pg_query.A_Expr_Kind_AEXPR_OP {
+	switch expr.Kind {
+	case pg_query.A_Expr_Kind_AEXPR_OP:
+		return evalAExprOp(expr)
+	case pg_query.A_Expr_Kind_AEXPR_NOT_DISTINCT:
+		left := evalExpr(expr.Lexpr)
+		right := evalExpr(expr.Rexpr)
+		if !left.known || !right.known {
+			return unknownValue()
+		}
+		if left.kind == constNull && right.kind == constNull {
+			return boolValue(true)
+		}
+		if left.kind == constNull || right.kind == constNull {
+			return boolValue(false)
+		}
+		eq, ok := constEqual(left, right)
+		if !ok {
+			return unknownValue()
+		}
+		return boolValue(eq)
+	case pg_query.A_Expr_Kind_AEXPR_DISTINCT:
+		left := evalExpr(expr.Lexpr)
+		right := evalExpr(expr.Rexpr)
+		if !left.known || !right.known {
+			return unknownValue()
+		}
+		if left.kind == constNull && right.kind == constNull {
+			return boolValue(false)
+		}
+		if left.kind == constNull || right.kind == constNull {
+			return boolValue(true)
+		}
+		eq, ok := constEqual(left, right)
+		if !ok {
+			return unknownValue()
+		}
+		return boolValue(!eq)
+	default:
 		return unknownValue()
 	}
+}
+
+func evalAExprOp(expr *pg_query.A_Expr) constValue {
 	op := aExprOperator(expr)
 	left := evalExpr(expr.Lexpr)
 	right := evalExpr(expr.Rexpr)
@@ -213,7 +253,6 @@ func evalAExpr(expr *pg_query.A_Expr) constValue {
 		return unknownValue()
 	}
 	if left.kind == constNull || right.kind == constNull {
-		// SQL comparison with NULL yields UNKNOWN.
 		return constValue{kind: constNull, known: true}
 	}
 	switch op {
@@ -229,6 +268,21 @@ func evalAExpr(expr *pg_query.A_Expr) constValue {
 			return unknownValue()
 		}
 		return boolValue(!eq)
+	case ">", ">=", "<", "<=":
+		cmp, ok := constCompare(left, right)
+		if !ok {
+			return unknownValue()
+		}
+		switch op {
+		case ">":
+			return boolValue(cmp > 0)
+		case ">=":
+			return boolValue(cmp >= 0)
+		case "<":
+			return boolValue(cmp < 0)
+		default:
+			return boolValue(cmp <= 0)
+		}
 	default:
 		return unknownValue()
 	}
@@ -286,6 +340,25 @@ func constEqual(a, b constValue) (bool, bool) {
 		return a.strV == b.strV, true
 	default:
 		return false, false
+	}
+}
+
+func constCompare(a, b constValue) (int, bool) {
+	if a.kind != constNumber || b.kind != constNumber {
+		return 0, false
+	}
+	af, aerr := strconv.ParseFloat(a.numV, 64)
+	bf, berr := strconv.ParseFloat(b.numV, 64)
+	if aerr != nil || berr != nil {
+		return 0, false
+	}
+	switch {
+	case af < bf:
+		return -1, true
+	case af > bf:
+		return 1, true
+	default:
+		return 0, true
 	}
 }
 
