@@ -30,13 +30,15 @@ type JSONSummary struct {
 
 // JSONStatement is one statement in the JSON output.
 type JSONStatement struct {
-	Index     int                      `json:"index"`
-	Type      string                   `json:"type"`
-	Table     string                   `json:"table"`
-	Object    string                   `json:"object,omitempty"`
-	StartLine int                      `json:"start_line,omitempty"`
-	Location  *analyzer.SourceLocation `json:"location,omitempty"`
-	Findings  []JSONFinding            `json:"findings"`
+	Index             int                      `json:"index"`
+	Type              string                   `json:"type"`
+	Table             string                   `json:"table"`
+	Object            string                   `json:"object,omitempty"`
+	StartLine         int                      `json:"start_line,omitempty"`
+	Completeness      string                   `json:"completeness,omitempty"`
+	IncompleteReasons []string                 `json:"incomplete_reasons,omitempty"`
+	Location          *analyzer.SourceLocation `json:"location,omitempty"`
+	Findings          []JSONFinding            `json:"findings"`
 }
 
 // JSONFinding is one finding in the JSON output.
@@ -88,13 +90,15 @@ func JSON(res *analyzer.Result, opts ...Options) (string, error) {
 	}
 	for i, st := range res.Statements {
 		out.Statements[i] = JSONStatement{
-			Index:     st.Index,
-			Type:      st.Type,
-			Table:     st.Table,
-			Object:    st.Object,
-			StartLine: st.StartLine,
-			Location:  st.Location,
-			Findings:  make([]JSONFinding, len(st.Findings)),
+			Index:             st.Index,
+			Type:              st.Type,
+			Table:             st.Table,
+			Object:            st.Object,
+			StartLine:         st.StartLine,
+			Completeness:      st.Completeness,
+			IncompleteReasons: st.IncompleteReasons,
+			Location:          st.Location,
+			Findings:          make([]JSONFinding, len(st.Findings)),
 		}
 		for j, f := range st.Findings {
 			out.Statements[i].Findings[j] = JSONFinding{

@@ -36,13 +36,15 @@ type SourceLocation struct {
 
 // StatementResult holds the analysis result for one statement.
 type StatementResult struct {
-	Index     int
-	Type      string
-	Table     string
-	Object    string
-	StartLine int
-	Location  *SourceLocation
-	Findings  []Finding
+	Index             int
+	Type              string
+	Table             string
+	Object            string
+	StartLine         int
+	Completeness      string
+	IncompleteReasons []string
+	Location          *SourceLocation
+	Findings          []Finding
 }
 
 // Summary captures the overall finding counts.

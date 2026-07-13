@@ -19,6 +19,7 @@ const (
 	RuleSelectAllProtectedTable     = "select_all_from_protected_table"
 	RuleSelectWithoutLimitProtected = "select_without_limit_from_protected_table"
 	RuleCopyToStdoutOrProgram       = "copy_to_stdout_or_program_from_protected_source"
+	RuleSemanticAnalysisIncomplete  = "semantic_analysis_incomplete"
 )
 
 // Rule describes one stable rule and its reporting metadata.
@@ -185,6 +186,15 @@ var catalog = []Rule{
 		DefaultDecision: "block",
 		Rationale:       "COPY TO STDOUT or PROGRAM is a direct bulk-exfiltration path for protected data.",
 		Remediation:     "Use a reviewed export workflow with explicit approval, destination, and audit trail.",
+	},
+	{
+		ID:              RuleSemanticAnalysisIncomplete,
+		Title:           "Semantic analysis incomplete",
+		Category:        "analysis_coverage",
+		Severity:        "medium",
+		DefaultDecision: "warn",
+		Rationale:       "When statement semantics are only partially understood, an allow decision would silently over-claim coverage.",
+		Remediation:     "Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.",
 	},
 }
 

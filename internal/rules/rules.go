@@ -3,7 +3,10 @@
 package rules
 
 import (
+	"fmt"
 	"slices"
+	"sort"
+	"strings"
 
 	"github.com/ChimdumebiNebolisa/DBwall/internal/parser"
 	"github.com/ChimdumebiNebolisa/DBwall/internal/policy"
@@ -25,6 +28,14 @@ func Check(stmt parser.Statement, p *policy.Policy) []Finding {
 	if p == nil {
 		p = policy.DefaultPolicy()
 	}
+	out := checkOne(stmt, p)
+	for _, nested := range stmt.Nested {
+		out = append(out, Check(nested, p)...)
+	}
+	return dedupeFindings(out)
+}
+
+func checkOne(stmt parser.Statement, p *policy.Policy) []Finding {
 	var out []Finding
 	add := func(f *Finding) {
 		if f != nil {
@@ -42,15 +53,14 @@ func Check(stmt parser.Statement, p *policy.Policy) []Finding {
 	add(checkDropColumn(stmt, p))
 	add(checkAlterDropSafetyConstraint(stmt, p))
 	add(checkTruncateTable(stmt, p))
-	add(checkGrantToPublicOnProtectedObjects(stmt, p))
 	add(checkAlterDefaultPrivilegesPublic(stmt, p))
 	add(checkGrantHighRiskRoleMembership(stmt, p))
-	add(checkSelectAllFromProtectedTable(stmt, p))
-	add(checkSelectWithoutLimitFromProtectedTable(stmt, p))
-	add(checkCopyToStdoutOrProgramFromProtectedSource(stmt, p))
-	for _, f := range checkWritesToProtectedTables(stmt, p) {
-		out = append(out, f)
-	}
+	out = append(out, checkGrantToPublicOnProtectedObjects(stmt, p)...)
+	out = append(out, checkSelectAllFromProtectedTable(stmt, p)...)
+	out = append(out, checkSelectWithoutLimitFromProtectedTable(stmt, p)...)
+	out = append(out, checkCopyToStdoutOrProgramFromProtectedSource(stmt, p)...)
+	out = append(out, checkWritesToProtectedTables(stmt, p)...)
+	add(checkSemanticAnalysisIncomplete(stmt, p))
 	return out
 }
 
@@ -125,31 +135,61 @@ func checkTruncateTable(stmt parser.Statement, p *policy.Policy) *Finding {
 }
 
 func checkWritesToProtectedTables(stmt parser.Statement, p *policy.Policy) []Finding {
-	if stmt.Table == "" || !p.IsProtectedTable(stmt.Table) {
-		return nil
-	}
 	switch stmt.Type {
 	case parser.StmtTypeDelete, parser.StmtTypeUpdate, parser.StmtTypeDropTable,
 		parser.StmtTypeAlterTable, parser.StmtTypeAlterTableDropCol,
 		parser.StmtTypeInsert, parser.StmtTypeTruncate:
-		decision := p.RuleDecision(policy.RuleWritesToProtectedTable)
-		return []Finding{*newFinding(policy.RuleWritesToProtectedTable, decision, "Write to protected table: "+stmt.Table)}
 	default:
 		return nil
 	}
+	names := protectedMutationNames(stmt, p)
+	if len(names) == 0 {
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleWritesToProtectedTable)
+	out := make([]Finding, 0, len(names))
+	for _, name := range names {
+		out = append(out, *newFinding(policy.RuleWritesToProtectedTable, decision, "Write to protected table: "+name))
+	}
+	return out
 }
 
-func checkGrantToPublicOnProtectedObjects(stmt parser.Statement, p *policy.Policy) *Finding {
-	if stmt.Type != parser.StmtTypeGrant || !stmt.IsGrantToPublic {
+func checkGrantToPublicOnProtectedObjects(stmt parser.Statement, p *policy.Policy) []Finding {
+	if stmt.Type != parser.StmtTypeGrant || !stmt.IsGrantToPublic || stmt.IsRoleMembershipGrant {
 		return nil
 	}
-	if stmt.Table == "" && stmt.Schema == "" {
-		return nil
+	decision := p.RuleDecision(policy.RuleGrantToPublicProtected)
+	var out []Finding
+	seen := map[string]struct{}{}
+	add := func(name string) {
+		if name == "" {
+			return
+		}
+		if !(p.IsProtectedTable(name) || p.IsProtectedSchema(name)) {
+			return
+		}
+		if _, ok := seen[name]; ok {
+			return
+		}
+		seen[name] = struct{}{}
+		out = append(out, *newFinding(policy.RuleGrantToPublicProtected, decision, "GRANT exposes a protected object to PUBLIC: "+name))
 	}
-	if !p.IsProtectedTable(stmt.Table) && !p.IsProtectedSchema(stmt.Schema) {
-		return nil
+	for _, rel := range stmt.TargetRelations() {
+		add(rel.QualifiedName())
+		if rel.Schema != "" {
+			if p.IsProtectedSchema(rel.Schema) {
+				add(rel.Schema)
+			}
+		}
 	}
-	return newFinding(policy.RuleGrantToPublicProtected, p.RuleDecision(policy.RuleGrantToPublicProtected), "GRANT exposes a protected object to PUBLIC")
+	if len(stmt.Relations) == 0 {
+		add(stmt.Table)
+	}
+	if stmt.Schema != "" {
+		add(stmt.Schema)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Message < out[j].Message })
+	return out
 }
 
 func checkAlterDefaultPrivilegesPublic(stmt parser.Statement, p *policy.Policy) *Finding {
@@ -163,7 +203,9 @@ func checkGrantHighRiskRoleMembership(stmt parser.Statement, p *policy.Policy) *
 	if stmt.Type != parser.StmtTypeGrant || !stmt.IsRoleMembershipGrant {
 		return nil
 	}
-	for _, role := range stmt.GrantedRoles {
+	roles := append([]string{}, stmt.GrantedRoles...)
+	sort.Strings(roles)
+	for _, role := range roles {
 		if p.IsProtectedRole(role) || slices.Contains(highRiskBuiltinRoles, role) {
 			return newFinding(policy.RuleGrantHighRiskRoleMembership, p.RuleDecision(policy.RuleGrantHighRiskRoleMembership), "GRANT assigns a high-risk role membership: "+role)
 		}
@@ -171,25 +213,180 @@ func checkGrantHighRiskRoleMembership(stmt parser.Statement, p *policy.Policy) *
 	return nil
 }
 
-func checkSelectAllFromProtectedTable(stmt parser.Statement, p *policy.Policy) *Finding {
-	if stmt.Type != parser.StmtTypeSelect || !stmt.SelectAll || !p.IsProtectedTable(stmt.Table) {
+func checkSelectAllFromProtectedTable(stmt parser.Statement, p *policy.Policy) []Finding {
+	if stmt.Type != parser.StmtTypeSelect || !stmt.SelectAll {
 		return nil
 	}
-	return newFinding(policy.RuleSelectAllProtectedTable, p.RuleDecision(policy.RuleSelectAllProtectedTable), "SELECT * reads every column from a protected table")
+	names := protectedReadNames(stmt, p)
+	if len(names) == 0 {
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleSelectAllProtectedTable)
+	out := make([]Finding, 0, len(names))
+	for _, name := range names {
+		out = append(out, *newFinding(policy.RuleSelectAllProtectedTable, decision, "SELECT * reads every column from a protected table: "+name))
+	}
+	return out
 }
 
-func checkSelectWithoutLimitFromProtectedTable(stmt parser.Statement, p *policy.Policy) *Finding {
-	if stmt.Type != parser.StmtTypeSelect || stmt.HasLimit || !p.IsProtectedTable(stmt.Table) {
+func checkSelectWithoutLimitFromProtectedTable(stmt parser.Statement, p *policy.Policy) []Finding {
+	if stmt.Type != parser.StmtTypeSelect || stmt.HasLimit {
 		return nil
 	}
-	return newFinding(policy.RuleSelectWithoutLimitProtected, p.RuleDecision(policy.RuleSelectWithoutLimitProtected), "SELECT reads from a protected table without a LIMIT")
+	names := protectedReadNames(stmt, p)
+	if len(names) == 0 {
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleSelectWithoutLimitProtected)
+	out := make([]Finding, 0, len(names))
+	for _, name := range names {
+		out = append(out, *newFinding(policy.RuleSelectWithoutLimitProtected, decision, "SELECT reads from a protected table without a LIMIT: "+name))
+	}
+	return out
 }
 
-func checkCopyToStdoutOrProgramFromProtectedSource(stmt parser.Statement, p *policy.Policy) *Finding {
-	if stmt.Type != parser.StmtTypeCopy || (!stmt.CopyToStdout && !stmt.CopyToProgram) || !p.IsProtectedTable(stmt.Table) {
+func checkCopyToStdoutOrProgramFromProtectedSource(stmt parser.Statement, p *policy.Policy) []Finding {
+	if stmt.Type != parser.StmtTypeCopy || (!stmt.CopyToStdout && !stmt.CopyToProgram) {
 		return nil
 	}
-	return newFinding(policy.RuleCopyToStdoutOrProgram, p.RuleDecision(policy.RuleCopyToStdoutOrProgram), "COPY exports data from a protected source to STDOUT or PROGRAM")
+	names := protectedReadNames(stmt, p)
+	if len(names) == 0 {
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleCopyToStdoutOrProgram)
+	out := make([]Finding, 0, len(names))
+	for _, name := range names {
+		out = append(out, *newFinding(policy.RuleCopyToStdoutOrProgram, decision, "COPY exports data from a protected source to STDOUT or PROGRAM: "+name))
+	}
+	return out
+}
+
+func checkSemanticAnalysisIncomplete(stmt parser.Statement, p *policy.Policy) *Finding {
+	switch stmt.Completeness {
+	case parser.AnalysisPartial, parser.AnalysisUnsupported:
+	default:
+		return nil
+	}
+	reasons := actionableIncompleteReasons(stmt.IncompleteReasons)
+	if len(reasons) == 0 {
+		// Core-mode reduced coverage is disclosed via coverage_mode, not this rule.
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleSemanticAnalysisIncomplete)
+	if decision == policy.DecisionWarn && shouldEscalateIncomplete(stmt) {
+		if p.Rules == nil || p.Rules[policy.RuleSemanticAnalysisIncomplete] == "" || p.Rules[policy.RuleSemanticAnalysisIncomplete] == "warn" {
+			decision = policy.DecisionBlock
+		}
+	}
+	summary := strings.Join(reasons, "; ")
+	if summary == "" {
+		summary = stmt.IncompleteSummary()
+	}
+	return newFinding(policy.RuleSemanticAnalysisIncomplete, decision, fmt.Sprintf("Semantic analysis is %s: %s", stmt.Completeness, summary))
+}
+
+func actionableIncompleteReasons(reasons []string) []string {
+	var out []string
+	for _, reason := range reasons {
+		switch reason {
+		case "core_mode_token_parser", "unsupported_statement_in_core_mode":
+			continue
+		default:
+			out = append(out, reason)
+		}
+	}
+	return out
+}
+
+func shouldEscalateIncomplete(stmt parser.Statement) bool {
+	if stmt.Completeness != parser.AnalysisPartial && stmt.Completeness != parser.AnalysisUnsupported {
+		return false
+	}
+	switch stmt.Type {
+	case parser.StmtTypeDelete, parser.StmtTypeUpdate, parser.StmtTypeInsert, parser.StmtTypeTruncate,
+		parser.StmtTypeDropTable, parser.StmtTypeAlterTable, parser.StmtTypeAlterTableDropCol:
+		for _, reason := range stmt.IncompleteReasons {
+			if strings.Contains(reason, "relation") || strings.Contains(reason, "from_item") || strings.Contains(reason, "unsupported") {
+				return true
+			}
+		}
+		return stmt.Completeness == parser.AnalysisUnsupported
+	case parser.StmtTypeOther:
+		return false
+	default:
+		return false
+	}
+}
+
+func protectedMutationNames(stmt parser.Statement, p *policy.Policy) []string {
+	seen := map[string]struct{}{}
+	var names []string
+	add := func(name string) {
+		if name == "" || !p.IsProtectedTable(name) {
+			return
+		}
+		if _, ok := seen[name]; ok {
+			return
+		}
+		seen[name] = struct{}{}
+		names = append(names, name)
+	}
+	for _, rel := range stmt.MutationRelations() {
+		add(rel.QualifiedName())
+	}
+	// Backward-compatible fallback when Relations is empty but Table is populated.
+	if len(stmt.Relations) == 0 {
+		add(stmt.Table)
+	}
+	sort.Strings(names)
+	return names
+}
+
+func protectedReadNames(stmt parser.Statement, p *policy.Policy) []string {
+	seen := map[string]struct{}{}
+	var names []string
+	add := func(name string) {
+		if name == "" || !p.IsProtectedTable(name) {
+			return
+		}
+		if _, ok := seen[name]; ok {
+			return
+		}
+		seen[name] = struct{}{}
+		names = append(names, name)
+	}
+	for _, rel := range stmt.ReadRelations() {
+		add(rel.QualifiedName())
+	}
+	if len(stmt.Relations) == 0 {
+		add(stmt.Table)
+	}
+	sort.Strings(names)
+	return names
+}
+
+func dedupeFindings(in []Finding) []Finding {
+	if len(in) <= 1 {
+		return in
+	}
+	type key struct{ rule, message string }
+	seen := map[key]struct{}{}
+	var out []Finding
+	for _, f := range in {
+		k := key{rule: f.Rule, message: f.Message}
+		if _, ok := seen[k]; ok {
+			continue
+		}
+		seen[k] = struct{}{}
+		out = append(out, f)
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Rule != out[j].Rule {
+			return out[i].Rule < out[j].Rule
+		}
+		return out[i].Message < out[j].Message
+	})
+	return out
 }
 
 func newFinding(ruleID string, decision policy.Decision, message string) *Finding {

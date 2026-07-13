@@ -16,8 +16,9 @@ type sarifLog struct {
 }
 
 type sarifRun struct {
-	Tool    sarifTool     `json:"tool"`
-	Results []sarifResult `json:"results"`
+	Tool       sarifTool         `json:"tool"`
+	Results    []sarifResult     `json:"results"`
+	Properties map[string]any    `json:"properties,omitempty"`
 }
 
 type sarifTool struct {
@@ -45,10 +46,11 @@ type sarifMultiformat struct {
 }
 
 type sarifResult struct {
-	RuleID    string           `json:"ruleId"`
-	Level     string           `json:"level"`
-	Message   sarifMultiformat `json:"message"`
-	Locations []sarifLocation  `json:"locations,omitempty"`
+	RuleID     string           `json:"ruleId"`
+	Level      string           `json:"level"`
+	Message    sarifMultiformat `json:"message"`
+	Locations  []sarifLocation  `json:"locations,omitempty"`
+	Properties map[string]any   `json:"properties,omitempty"`
 }
 
 type sarifLocation struct {
@@ -95,6 +97,9 @@ func SARIF(res *analyzer.Result, opts Options) (string, error) {
 				InformationURI: "https://github.com/ChimdumebiNebolisa/DBwall",
 				Rules:          rules,
 			}},
+			Properties: map[string]any{
+				"coverageMode": opts.CoverageMode,
+			},
 		}},
 	}
 	if res != nil {
@@ -104,6 +109,10 @@ func SARIF(res *analyzer.Result, opts Options) (string, error) {
 					RuleID:  f.Rule,
 					Level:   sarifLevel(f),
 					Message: sarifMultiformat{Text: fmt.Sprintf("%s. %s", f.Message, f.Remediation)},
+					Properties: map[string]any{
+						"completeness":      st.Completeness,
+						"incompleteReasons": st.IncompleteReasons,
+					},
 				}
 				if opts.SourcePath != "" {
 					result.Locations = []sarifLocation{{
