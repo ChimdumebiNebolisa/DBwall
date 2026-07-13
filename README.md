@@ -41,10 +41,18 @@ Exit codes:
 
 DBwall reports its parser coverage mode explicitly:
 
-- `full`: PostgreSQL parser-backed validation when built with `CGO_ENABLED=1`
-- `core`: portable fallback mode with reduced advanced-rule coverage
+- `full` (`CGO_ENABLED=1`): security metadata is derived by walking the structured PostgreSQL AST from `pg_query_go` (relations, grants, predicates, nested CTE/subquery sources). JSON/SARIF also expose per-statement `completeness`.
+- `core` (`CGO_ENABLED=0`): portable token parser with explicitly reduced semantic coverage. Multi-table joins, nested CTE mutations, and several GRANT/DROP multi-object shapes are only accurate in `full` mode.
 
-Release binaries are built for portability, so they run in `core` mode unless you build from source with CGO enabled.
+Checks that need `full` mode for accurate relation discovery include:
+
+- join / `UPDATE ... FROM` / `DELETE ... USING` secondary relations
+- CTE and subquery sources (including `COPY (SELECT ...)`)
+- multi-object `DROP TABLE` / `TRUNCATE` / `GRANT ... ON TABLE a, b`
+- constant-folded trivial predicates beyond `TRUE` and `1 = 1`
+- explicit `semantic_analysis_incomplete` findings for unsupported AST statement types
+
+Release binaries are built with `CGO_ENABLED=0` for portability, so they run in `core` mode unless you build from source with CGO enabled.
 
 ## Install
 
@@ -176,6 +184,7 @@ DBwall includes an adversarial corpus under [test_e2e/testdata/corpus.json](test
 - borderline queries
 - obviously dangerous queries
 - false-positive cases
+- multi-table / CTE / COPY-select / multi-object and incomplete-analysis cases (many require `full` mode)
 
 ## Benchmark
 
@@ -184,7 +193,7 @@ The reproducible benchmark harness lives under `benchmark/`.
 Run it from the repo root:
 
 ```bash
-go run ./benchmark/cmd/dbwallbench --repo-root . --manifest ./benchmark/manifest.json --json-out ./benchmark/results/benchmark_results.json --report-out ./benchmark/reports/benchmark_report.md
+CGO_ENABLED=1 go run ./benchmark/cmd/dbwallbench --repo-root . --manifest ./benchmark/manifest.json --json-out ./benchmark/results/benchmark_results.json --report-out ./benchmark/reports/benchmark_report.md
 ```
 
 Saved artifacts:
@@ -195,24 +204,25 @@ Saved artifacts:
 Current saved run from [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json):
 
 - Corpus: `benchmark/manifest.json`
-- Coverage mode: `core`
-- Total cases: `9`
-- Correct blocks: `3`
-- Correct allows: `3`
-- Correct warns: `3`
+- Coverage mode: `full`
+- Total cases: `29`
+- Correct blocks: `13`
+- Correct allows: `6`
+- Correct warns: `10`
 - False positives: `0`
 - False negatives: `0`
 - Precision (`block` as positive class): `1.0000`
 - Recall (`block` as positive class): `1.0000`
 - Accuracy (exact decision match): `1.0000`
-- Average runtime per case: `91.973 ms`
+- Average runtime per case: `4.481 ms`
 
-Those numbers are measured results from the saved artifact, not a generalized product claim. Precision and recall use `block` as the positive class, and the run above reflects the fallback `core` coverage mode shown in the artifact.
+Those numbers are measured results from the saved artifact, not a generalized product claim. Precision and recall use `block` as the positive class. Cases marked `requires_full` are included only when the built binary reports `coverage_mode=full`.
 
 ## Local Development
 
 ```bash
-go test ./...
+CGO_ENABLED=1 go test ./...
+CGO_ENABLED=0 go test ./...
 go vet ./...
 ```
 
