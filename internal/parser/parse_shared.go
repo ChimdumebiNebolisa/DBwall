@@ -168,32 +168,49 @@ func parseStatementText(sql string, startLine int) (Statement, error) {
 	}
 
 	stmt := Statement{
-		RawSQL:    strings.TrimSpace(sql),
-		StartLine: startLine,
+		RawSQL:       strings.TrimSpace(sql),
+		StartLine:    startLine,
+		Completeness: AnalysisPartial,
+		IncompleteReasons: []string{
+			"core_mode_token_parser",
+		},
 	}
 
+	var (
+		out Statement
+		parseErr error
+	)
 	switch upper(tokens[0]) {
 	case "DELETE":
-		return parseDeleteTokens(tokens, stmt)
+		out, parseErr = parseDeleteTokens(tokens, stmt)
 	case "UPDATE":
-		return parseUpdateTokens(tokens, stmt)
+		out, parseErr = parseUpdateTokens(tokens, stmt)
 	case "DROP":
-		return parseDropTokens(tokens, stmt)
+		out, parseErr = parseDropTokens(tokens, stmt)
 	case "ALTER":
-		return parseAlterTokens(tokens, stmt)
+		out, parseErr = parseAlterTokens(tokens, stmt)
 	case "SELECT":
-		return parseSelectTokens(tokens, stmt), nil
+		out, parseErr = parseSelectTokens(tokens, stmt), nil
 	case "INSERT":
-		return parseInsertTokens(tokens, stmt)
+		out, parseErr = parseInsertTokens(tokens, stmt)
 	case "TRUNCATE":
-		return parseTruncateTokens(tokens, stmt)
+		out, parseErr = parseTruncateTokens(tokens, stmt)
 	case "GRANT":
-		return parseGrantTokens(tokens, stmt)
+		out, parseErr = parseGrantTokens(tokens, stmt)
 	case "COPY":
-		return parseCopyTokens(tokens, stmt)
+		out, parseErr = parseCopyTokens(tokens, stmt)
 	default:
 		return Statement{}, fmt.Errorf("syntax error at or near %q", tokens[0])
 	}
+	if parseErr != nil {
+		return Statement{}, parseErr
+	}
+	if out.Type == StmtTypeOther {
+		markIncomplete(&out, AnalysisUnsupported, "unsupported_statement_in_core_mode")
+	}
+	syncConvenienceFields(&out)
+	out.IncompleteReasons = ensureReasonsBounded(out.IncompleteReasons, 5)
+	return out, nil
 }
 
 func parseDeleteTokens(tokens []string, stmt Statement) (Statement, error) {
@@ -740,9 +757,29 @@ func isIdentifierPart(ch rune) bool {
 }
 
 func setRelation(stmt *Statement, name string) {
+	setRelationWithRole(stmt, name, defaultRoleForStmt(stmt.Type))
+}
+
+func setRelationWithRole(stmt *Statement, name string, role RelationRole) {
+	schema, rel := splitQualified(name)
+	addRelation(stmt, schema, rel, role)
 	stmt.Table = name
 	stmt.Object = name
-	stmt.Schema = relationSchema(name)
+	stmt.Schema = schema
+	if stmt.Schema == "" {
+		stmt.Schema = relationSchema(name)
+	}
+}
+
+func defaultRoleForStmt(t StmtType) RelationRole {
+	switch t {
+	case StmtTypeSelect, StmtTypeCopy:
+		return RelationRead
+	case StmtTypeGrant, StmtTypeAlterDefaultPrivileges:
+		return RelationTarget
+	default:
+		return RelationWrite
+	}
 }
 
 func relationSchema(name string) string {
