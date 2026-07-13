@@ -18,6 +18,7 @@ type corpusCase struct {
 	Policy        *policy.Policy `json:"policy,omitempty"`
 	Decision      string         `json:"decision"`
 	ExpectedRules []string       `json:"expected_rules"`
+	RequiresFull  bool           `json:"requires_full,omitempty"`
 }
 
 func TestAdversarialCorpus(t *testing.T) {
@@ -31,6 +32,9 @@ func TestAdversarialCorpus(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.ID, func(t *testing.T) {
+			if tc.RequiresFull && parser.CoverageMode() != "full" {
+				t.Skip("requires full (CGO) coverage mode")
+			}
 			p := tc.Policy
 			if p == nil {
 				p = policy.DefaultPolicy()
@@ -41,7 +45,7 @@ func TestAdversarialCorpus(t *testing.T) {
 			}
 			res := analyzer.Analyze(stmts, p)
 			if string(res.Decision) != tc.Decision {
-				t.Fatalf("decision want %s, got %s", tc.Decision, res.Decision)
+				t.Fatalf("decision want %s, got %s findings=%#v", tc.Decision, res.Decision, res.Statements)
 			}
 			var got []string
 			for _, st := range res.Statements {

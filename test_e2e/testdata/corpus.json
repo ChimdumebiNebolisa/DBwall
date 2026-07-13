@@ -14,6 +14,20 @@
     "expected_rules": []
   },
   {
+    "id": "good_variable_predicate_not_trivial",
+    "category": "good",
+    "sql": "DELETE FROM users WHERE id = id;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "good_keyword_named_identifier",
+    "category": "false_positive",
+    "sql": "SELECT id FROM \"select\" LIMIT 1;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
     "id": "borderline_protected_select_with_limit",
     "category": "borderline",
     "sql": "SELECT id FROM public.users LIMIT 10;",
@@ -36,6 +50,30 @@
     "expected_rules": ["select_all_from_protected_table"]
   },
   {
+    "id": "borderline_join_protected_second_table",
+    "category": "borderline",
+    "requires_full": true,
+    "sql": "SELECT * FROM orders o JOIN users u ON o.user_id = u.id LIMIT 5;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "warn",
+    "expected_rules": ["select_all_from_protected_table"]
+  },
+  {
+    "id": "borderline_cte_read_protected",
+    "category": "borderline",
+    "requires_full": true,
+    "sql": "WITH recent AS (SELECT * FROM users) SELECT * FROM recent LIMIT 10;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "warn",
+    "expected_rules": ["select_all_from_protected_table"]
+  },
+  {
     "id": "dangerous_delete_without_where",
     "category": "dangerous",
     "sql": "DELETE FROM users;",
@@ -50,6 +88,14 @@
     "expected_rules": ["update_trivial_where"]
   },
   {
+    "id": "dangerous_delete_true_or_filter",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "DELETE FROM users WHERE TRUE OR id = 5;",
+    "decision": "block",
+    "expected_rules": ["delete_trivial_where"]
+  },
+  {
     "id": "dangerous_truncate",
     "category": "dangerous",
     "sql": "TRUNCATE TABLE users;",
@@ -57,11 +103,39 @@
     "expected_rules": ["truncate_table"]
   },
   {
+    "id": "dangerous_truncate_multi",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "TRUNCATE users, payments;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["payments"],
+      "rules": {
+        "truncate_table": "block",
+        "writes_to_protected_tables": "warn"
+      }
+    },
+    "decision": "block",
+    "expected_rules": ["truncate_table", "writes_to_protected_tables"]
+  },
+  {
     "id": "dangerous_drop_schema",
     "category": "dangerous",
     "sql": "DROP SCHEMA reporting;",
     "decision": "block",
     "expected_rules": ["drop_schema"]
+  },
+  {
+    "id": "dangerous_drop_table_multi",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "DROP TABLE a, users;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["drop_table", "writes_to_protected_tables"]
   },
   {
     "id": "dangerous_public_grant",
@@ -75,6 +149,32 @@
     "expected_rules": ["grant_to_public_on_protected_objects"]
   },
   {
+    "id": "dangerous_public_grant_multi",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "GRANT SELECT ON TABLE orders, users TO PUBLIC;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["grant_to_public_on_protected_objects"]
+  },
+  {
+    "id": "dangerous_role_grant",
+    "category": "dangerous",
+    "sql": "GRANT pg_read_all_data TO analyst;",
+    "decision": "block",
+    "expected_rules": ["grant_high_risk_role_membership"]
+  },
+  {
+    "id": "dangerous_default_privileges",
+    "category": "dangerous",
+    "sql": "ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO PUBLIC;",
+    "decision": "block",
+    "expected_rules": ["alter_default_privileges_public"]
+  },
+  {
     "id": "dangerous_copy_program",
     "category": "dangerous",
     "sql": "COPY users TO PROGRAM 'cat';",
@@ -84,6 +184,66 @@
     },
     "decision": "block",
     "expected_rules": ["copy_to_stdout_or_program_from_protected_source"]
+  },
+  {
+    "id": "dangerous_copy_select_stdout",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "COPY (SELECT * FROM users) TO STDOUT;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["copy_to_stdout_or_program_from_protected_source"]
+  },
+  {
+    "id": "dangerous_update_from_protected",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "UPDATE orders SET status = 'x' FROM users WHERE orders.user_id = users.id;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["orders"]
+    },
+    "decision": "warn",
+    "expected_rules": ["writes_to_protected_tables"]
+  },
+  {
+    "id": "dangerous_delete_using",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "DELETE FROM users USING sessions;",
+    "decision": "block",
+    "expected_rules": ["delete_without_where"]
+  },
+  {
+    "id": "dangerous_insert_select_protected",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "INSERT INTO archive SELECT * FROM users;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["archive"]
+    },
+    "decision": "warn",
+    "expected_rules": ["writes_to_protected_tables"]
+  },
+  {
+    "id": "dangerous_cte_delete",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "WITH x AS (DELETE FROM users RETURNING id) SELECT * FROM x;",
+    "decision": "block",
+    "expected_rules": ["delete_without_where"]
+  },
+  {
+    "id": "dangerous_unsupported_create_index",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "CREATE INDEX ON users (id);",
+    "decision": "warn",
+    "expected_rules": ["semantic_analysis_incomplete"]
   },
   {
     "id": "false_positive_comment_only",
@@ -102,5 +262,38 @@
     },
     "decision": "allow",
     "expected_rules": []
+  },
+  {
+    "id": "false_positive_exists_predicate",
+    "category": "false_positive",
+    "sql": "DELETE FROM users WHERE EXISTS (SELECT 1 FROM approved_users WHERE approved_users.id = users.id);",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "false_positive_dollar_quoted_body",
+    "category": "false_positive",
+    "sql": "SELECT $tag$DELETE FROM users;$tag$;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "false_positive_unusual_whitespace",
+    "category": "false_positive",
+    "sql": "SELECT\n\tid\nFROM\torders\nWHERE\tid\t=\t1\nLIMIT\t1;",
+    "decision": "allow",
+    "expected_rules": []
+  },
+  {
+    "id": "schema_qualified_quoted",
+    "category": "borderline",
+    "requires_full": true,
+    "sql": "SELECT * FROM public.\"Users\" LIMIT 1;",
+    "policy": {
+      "dialect": "postgres",
+      "protected_tables": ["Users"]
+    },
+    "decision": "warn",
+    "expected_rules": ["select_all_from_protected_table"]
   }
 ]

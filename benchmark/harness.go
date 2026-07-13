@@ -25,6 +25,7 @@ type ManifestCase struct {
 	SQLFile          string `json:"sql_file"`
 	PolicyFile       string `json:"policy_file,omitempty"`
 	ExpectedDecision string `json:"expected_decision"`
+	RequiresFull     bool   `json:"requires_full,omitempty"`
 }
 
 type Options struct {
@@ -41,6 +42,7 @@ type RunResult struct {
 	BinaryPath       string       `json:"binary_path"`
 	BuildCommand     []string     `json:"build_command"`
 	WarmupCommand    []string     `json:"warmup_command"`
+	CoverageMode     string       `json:"coverage_mode"`
 	Cases            []CaseResult `json:"cases"`
 	Metrics          Metrics      `json:"metrics"`
 	PositiveDecision string       `json:"positive_decision"`
@@ -85,7 +87,8 @@ type Definitions struct {
 }
 
 type dbguardJSON struct {
-	Decision string `json:"decision"`
+	Decision     string `json:"decision"`
+	CoverageMode string `json:"coverage_mode"`
 }
 
 func Run(ctx context.Context, opts Options) (RunResult, error) {
@@ -144,7 +147,16 @@ func Run(ctx context.Context, opts Options) (RunResult, error) {
 		return RunResult{}, err
 	}
 
+	coverageMode, err := detectCoverageMode(ctx, repoRoot, binaryPath)
+	if err != nil {
+		return RunResult{}, err
+	}
+	result.CoverageMode = coverageMode
+
 	for _, c := range sortedCases {
+		if c.RequiresFull && coverageMode != "full" {
+			continue
+		}
 		caseResult, err := runCase(ctx, repoRoot, binaryPath, c, manifest.PositiveDecision)
 		if err != nil {
 			return RunResult{}, err
@@ -302,6 +314,7 @@ func writeReport(path string, result RunResult) error {
 	var b strings.Builder
 	b.WriteString("# DBwall Benchmark Report\n\n")
 	b.WriteString("## Measured Results\n\n")
+	b.WriteString(fmt.Sprintf("- Coverage mode: `%s`\n", result.CoverageMode))
 	b.WriteString(fmt.Sprintf("- Total cases: `%d`\n", result.Metrics.TotalCases))
 	b.WriteString(fmt.Sprintf("- Correct blocks: `%d`\n", result.Metrics.CorrectBlocks))
 	b.WriteString(fmt.Sprintf("- Correct allows: `%d`\n", result.Metrics.CorrectAllows))
@@ -314,6 +327,8 @@ func writeReport(path string, result RunResult) error {
 	b.WriteString(fmt.Sprintf("- Average runtime per case: `%.3f ms`\n\n", result.Metrics.AverageRuntimeMillis))
 
 	b.WriteString("## Assumptions and Definitions\n\n")
+	b.WriteString(fmt.Sprintf("- Coverage mode is taken from the built `dbguard` JSON `coverage_mode` field (`%s`).\n", result.CoverageMode))
+	b.WriteString("- Cases marked `requires_full` are skipped when coverage mode is not `full`.\n")
 	b.WriteString(fmt.Sprintf("- Positive class for precision/recall: `%s`\n", result.Definitions.PrecisionPositiveClass))
 	b.WriteString(fmt.Sprintf("- %s\n", result.Definitions.AccuracyDefinition))
 	b.WriteString(fmt.Sprintf("- %s\n\n", result.Definitions.RuntimeDefinition))
@@ -336,6 +351,25 @@ func writeReport(path string, result RunResult) error {
 		return fmt.Errorf("write benchmark report: %w", err)
 	}
 	return nil
+}
+
+func detectCoverageMode(ctx context.Context, repoRoot, binaryPath string) (string, error) {
+	cmd := exec.CommandContext(ctx, binaryPath, "review-sql", "SELECT 1;", "--format", "json")
+	cmd.Dir = repoRoot
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			return "", fmt.Errorf("detect coverage mode: %w\noutput: %s", err, string(output))
+		}
+	}
+	var parsed dbguardJSON
+	if err := json.Unmarshal(output, &parsed); err != nil {
+		return "", fmt.Errorf("detect coverage mode parse: %w\noutput: %s", err, string(output))
+	}
+	if parsed.CoverageMode == "" {
+		return "", fmt.Errorf("coverage_mode missing from dbguard json")
+	}
+	return parsed.CoverageMode, nil
 }
 
 func runCommand(ctx context.Context, dir string, args ...string) error {
