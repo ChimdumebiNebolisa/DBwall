@@ -31,3 +31,4 @@ rules:
   select_all_from_protected_table: warn
   select_without_limit_from_protected_table: warn
   copy_to_stdout_or_program_from_protected_source: block
+  semantic_analysis_incomplete: warn

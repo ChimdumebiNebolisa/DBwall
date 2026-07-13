@@ -20,6 +20,24 @@
       "expected_decision": "allow"
     },
     {
+      "id": "allow_exists_predicate",
+      "category": "benign",
+      "sql_file": "cases/adversarial/exists_predicate.sql",
+      "expected_decision": "allow"
+    },
+    {
+      "id": "allow_keyword_ident",
+      "category": "benign",
+      "sql_file": "cases/adversarial/keyword_ident.sql",
+      "expected_decision": "allow"
+    },
+    {
+      "id": "allow_dollar_quoted",
+      "category": "benign",
+      "sql_file": "cases/adversarial/dollar_quoted.sql",
+      "expected_decision": "allow"
+    },
+    {
       "id": "borderline_protected_select_star_limit",
       "category": "borderline",
       "sql_file": "cases/borderline/protected_select_star_limit.sql",
@@ -41,6 +59,37 @@
       "expected_decision": "warn"
     },
     {
+      "id": "borderline_join_protected",
+      "category": "borderline",
+      "sql_file": "cases/adversarial/join_protected.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "borderline_cte_protected",
+      "category": "borderline",
+      "sql_file": "cases/adversarial/cte_protected.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "borderline_schema_quoted",
+      "category": "borderline",
+      "sql_file": "cases/adversarial/schema_quoted.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "borderline_nested_subquery",
+      "category": "borderline",
+      "sql_file": "cases/adversarial/nested_subquery.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn"
+    },
+    {
       "id": "block_delete_without_where",
       "category": "dangerous",
       "sql_file": "cases/dangerous/delete_without_where.sql",
@@ -57,6 +106,101 @@
       "category": "dangerous",
       "sql_file": "cases/dangerous/grant_public_protected.sql",
       "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block"
+    },
+    {
+      "id": "block_delete_true_or",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/delete_true_or.sql",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "block_truncate_multi",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/truncate_multi.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "block_drop_table_multi",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/drop_table_multi.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "block_grant_multi",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/grant_multi.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "block_copy_select_stdout",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/copy_select_stdout.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "block_copy_table_stdout",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/copy_table_stdout.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "block"
+    },
+    {
+      "id": "warn_update_from_protected",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/update_from.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "block_delete_using",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/delete_using.sql",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "warn_insert_select_protected",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/insert_select.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "block_cte_delete",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/cte_delete.sql",
+      "expected_decision": "block",
+      "requires_full": true
+    },
+    {
+      "id": "warn_unsupported_create_index",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/create_index_unsupported.sql",
+      "expected_decision": "warn",
+      "requires_full": true
+    },
+    {
+      "id": "block_role_grant",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/role_grant.sql",
+      "expected_decision": "block"
+    },
+    {
+      "id": "block_default_privileges",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/default_privileges.sql",
       "expected_decision": "block"
     }
   ]

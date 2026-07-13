@@ -1,6 +1,6 @@
 module github.com/ChimdumebiNebolisa/DBwall
 
-go 1.21
+go 1.23.0
 
 require (
 	github.com/pganalyze/pg_query_go/v5 v5.1.0

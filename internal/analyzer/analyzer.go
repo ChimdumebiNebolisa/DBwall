@@ -15,12 +15,14 @@ func Analyze(stmts []parser.Statement, p *policy.Policy) *Result {
 	for i, stmt := range stmts {
 		findings := rules.Check(stmt, p)
 		sr := StatementResult{
-			Index:     i + 1,
-			Type:      string(stmt.Type),
-			Table:     stmt.Table,
-			Object:    stmt.Object,
-			StartLine: stmt.StartLine,
-			Findings:  convertFindings(i+1, findings),
+			Index:             i + 1,
+			Type:              string(stmt.Type),
+			Table:             stmt.Table,
+			Object:            stmt.Object,
+			StartLine:         stmt.StartLine,
+			Completeness:      string(stmt.Completeness),
+			IncompleteReasons: append([]string{}, stmt.IncompleteReasons...),
+			Findings:          convertFindings(i+1, findings),
 		}
 		statementResults = append(statementResults, sr)
 	}

@@ -43,6 +43,7 @@ const (
 	RuleSelectAllProtectedTable     = rulemeta.RuleSelectAllProtectedTable
 	RuleSelectWithoutLimitProtected = rulemeta.RuleSelectWithoutLimitProtected
 	RuleCopyToStdoutOrProgram       = rulemeta.RuleCopyToStdoutOrProgram
+	RuleSemanticAnalysisIncomplete  = rulemeta.RuleSemanticAnalysisIncomplete
 )
 
 // Policy holds dialect, protected tables, and per-rule decisions.

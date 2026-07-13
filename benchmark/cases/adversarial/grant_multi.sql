@@ -1,0 +1,1 @@
+GRANT SELECT ON TABLE orders, users TO PUBLIC;

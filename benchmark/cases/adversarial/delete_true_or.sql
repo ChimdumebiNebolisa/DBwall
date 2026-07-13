@@ -1,0 +1,1 @@
+DELETE FROM users WHERE TRUE OR id = 5;
