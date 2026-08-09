@@ -1,0 +1,76 @@
+name: Smoke PR Gate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/smoke-pr-gate.yml"
+
+permissions:
+  contents: read
+  # No security-events write needed; this smoke test skips SARIF upload.
+
+jobs:
+  smoke-full-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare fixture SQL
+        id: fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p smoke/fixtures
+          printf '%s\n' 'GRANT SELECT ON TABLE orders, users TO PUBLIC;' > "smoke/fixtures/grant multi.sql"
+          printf '%s\n' 'SELECT 1;' > smoke/fixtures/safe.sql
+          {
+            echo "sql-paths<<EOF"
+            printf '%s\n' "smoke/fixtures/grant multi.sql"
+            printf '%s\n' "smoke/fixtures/safe.sql"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Run DBwall v0.2.0 action
+        id: dbwall
+        uses: ChimdumebiNebolisa/DBwall@v0.2.0
+        with:
+          version: v0.2.0
+          policy: ./test_e2e/testdata/grant_multi_policy.yaml
+          sql-paths: ${{ steps.fixtures.outputs.sql-paths }}
+          fail-on-warn: "false"
+          sarif-file: smoke-dbwall.sarif
+        continue-on-error: true
+
+      - name: Assert block decision and valid SARIF
+        shell: bash
+        env:
+          DECISION: ${{ steps.dbwall.outputs.decision }}
+          EXIT_CODE: ${{ steps.dbwall.outputs.exit-code }}
+          SQL_COUNT: ${{ steps.dbwall.outputs.sql-count }}
+          STEP_OUTCOME: ${{ steps.dbwall.outcome }}
+        run: |
+          set -euo pipefail
+          echo "decision=${DECISION} exit-code=${EXIT_CODE} sql-count=${SQL_COUNT} outcome=${STEP_OUTCOME}"
+          test "${SQL_COUNT}" = "2"
+          test "${DECISION}" = "block"
+          test "${EXIT_CODE}" = "3"
+          # Composite action should fail the step on block (exit 3).
+          test "${STEP_OUTCOME}" = "failure"
+          test -f smoke-dbwall.sarif
+          python3 - <<'PY'
+          import json
+          with open("smoke-dbwall.sarif", encoding="utf-8") as fh:
+              sarif = json.load(fh)
+          assert len(sarif.get("runs", [])) == 1, sarif
+          results = sarif["runs"][0].get("results")
+          assert isinstance(results, list) and len(results) >= 1, results
+          uris = []
+          for r in results:
+              for loc in r.get("locations", []):
+                  uris.append(loc["physicalLocation"]["artifactLocation"]["uri"])
+          joined = "\n".join(uris)
+          assert "grant multi.sql" in joined, uris
+          print("smoke SARIF OK:", uris)
+          PY
+          echo "smoke-pr-gate passed"
