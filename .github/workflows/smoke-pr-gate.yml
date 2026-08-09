@@ -1,5 +1,6 @@
 name: Smoke PR Gate
 
+# Real end-to-end smoke against the published v0.2.0 action + full artifact.
 on:
   workflow_dispatch:
   push:
