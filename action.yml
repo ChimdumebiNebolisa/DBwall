@@ -106,7 +106,8 @@ runs:
           echo "checksums.txt missing or empty; refusing to use unverified binary" >&2
           exit 1
         fi
-        if ! grep -F " ${ASSET}" checksums.txt > expected.sha256; then
+        # Accept bare names or ./name entries from sha256sum.
+        if ! grep -E " ([.]/)?${ASSET}\$" checksums.txt > expected.sha256; then
           echo "no checksum entry for ${ASSET}; refusing to use unverified binary" >&2
           exit 1
         fi
@@ -114,7 +115,9 @@ runs:
           echo "checksum entry for ${ASSET} is empty; refusing to use unverified binary" >&2
           exit 1
         fi
-        sha256sum -c expected.sha256
+        # Normalize to the local downloaded basename for sha256sum -c.
+        awk -v asset="${ASSET}" '{print $1 "  " asset}' expected.sha256 > expected.normalized.sha256
+        sha256sum -c expected.normalized.sha256
 
         tar -xzf "${ASSET}"
         chmod +x dbguard

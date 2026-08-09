@@ -74,7 +74,9 @@ jobs:
           fi
           rm -rf "${VERIFY_DIR}"
 
-          (cd dist && sha256sum ./*.tar.gz ./*.zip > checksums.txt)
+          # Emit bare filenames (not ./name) so consumers can grep/sha256sum -c
+          # against the downloaded asset name.
+          (cd dist && sha256sum -- *.tar.gz *.zip > checksums.txt)
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
