@@ -19,6 +19,9 @@ jobs:
         with:
           go-version: "1.23.12"
 
+      - name: Install C toolchain for full-mode build
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
       - name: Build archives
         shell: bash
         run: |
@@ -26,6 +29,8 @@ jobs:
           VERSION="${GITHUB_REF_NAME}"
           LDFLAGS="-X github.com/ChimdumebiNebolisa/DBwall/internal/version.Version=${VERSION}"
           mkdir -p dist
+
+          # Portable core-mode archives (no CGO).
           builds=(
             "linux amd64 tar.gz"
             "darwin amd64 tar.gz"
@@ -49,6 +54,26 @@ jobs:
             fi
             rm -rf "${OUTDIR}"
           done
+
+          # Full-mode Linux amd64 archive for first-party PR gates (CGO + pg_query).
+          FULL_OUTDIR="dist/dbguard_${VERSION}_linux_amd64_full"
+          mkdir -p "${FULL_OUTDIR}"
+          CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o "${FULL_OUTDIR}/dbguard" ./cmd/dbguard
+          cp README.md LICENSE "${FULL_OUTDIR}/"
+          printf '%s\n' "coverage_mode=full" "cgo_enabled=1" > "${FULL_OUTDIR}/COVERAGE_MODE.txt"
+          tar -C "${FULL_OUTDIR}" -czf "dist/dbguard_${VERSION}_linux_amd64_full.tar.gz" .
+          rm -rf "${FULL_OUTDIR}"
+
+          # Verify the full artifact reports coverage_mode=full.
+          VERIFY_DIR="$(mktemp -d)"
+          tar -xzf "dist/dbguard_${VERSION}_linux_amd64_full.tar.gz" -C "${VERIFY_DIR}"
+          MODE="$("${VERIFY_DIR}/dbguard" review-sql 'SELECT 1;' --format json | python3 -c 'import json,sys; print(json.load(sys.stdin).get("coverage_mode",""))')"
+          if [[ "${MODE}" != "full" ]]; then
+            echo "full release artifact reported coverage_mode=${MODE}, expected full" >&2
+            exit 1
+          fi
+          rm -rf "${VERIFY_DIR}"
+
           (cd dist && sha256sum *.tar.gz *.zip > checksums.txt)
 
       - name: Publish GitHub release

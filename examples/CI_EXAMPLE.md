@@ -25,4 +25,4 @@ if data["decision"] == "warn":
 PY
 ```
 
-If you need full PostgreSQL parser-backed coverage in CI, replace the binary download with a source build using `CGO_ENABLED=1`.
+For full PostgreSQL parser-backed coverage in CI, prefer the tagged `dbguard_<version>_linux_amd64_full.tar.gz` release asset (built with `CGO_ENABLED=1`), or build from source with CGO enabled. Multi-file reviews should use `dbguard review-files`.

@@ -1,6 +1,6 @@
 # Using DBwall in GitHub Actions
 
-This workflow example downloads a tagged DBwall binary, scans changed SQL, uploads SARIF to GitHub code scanning, and fails the job on blocking findings.
+This workflow uses the first-party composite action to download the **full-mode** Linux binary, review every changed `.sql` file on a pull request, upload SARIF to GitHub code scanning, and fail the job on blocking findings.
 
 ```yaml
 name: dbwall
@@ -8,51 +8,69 @@ name: dbwall
 on:
   pull_request:
     paths:
-      - "migrations/**/*.sql"
-      - "scripts/**/*.sql"
+      - "**/*.sql"
+      - "**/dbguard.yaml"
   push:
     branches: [main]
     paths:
-      - "migrations/**/*.sql"
-      - "scripts/**/*.sql"
+      - "**/*.sql"
+      - "**/dbguard.yaml"
+
+permissions:
+  contents: read
+  pull-requests: read
+  security-events: write
 
 jobs:
   review-sql:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Download DBwall release binary
+      - name: Collect changed SQL files
+        id: changed
+        shell: bash
         run: |
-          VERSION="v0.2.0"
-          curl -L -o dbwall.tar.gz "https://github.com/ChimdumebiNebolisa/DBwall/releases/download/${VERSION}/dbguard_${VERSION}_linux_amd64.tar.gz"
-          tar -xzf dbwall.tar.gz
-          chmod +x dbguard
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.sha }}"
+          fi
+          if [[ -z "${BASE}" || "${BASE}" == "0000000000000000000000000000000000000000" ]]; then
+            mapfile -t files < <(git ls-files '*.sql')
+          else
+            mapfile -t files < <(git diff --name-only --diff-filter=ACMR "${BASE}" "${HEAD}" -- '*.sql')
+          fi
+          {
+            echo "sql-paths<<EOF"
+            printf '%s\n' "${files[@]}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
 
-      - name: Review SQL and emit SARIF
-        run: |
-          ./dbguard review-file ./migrations/latest.sql --policy ./migrations/dbguard.yaml --format sarif > dbwall.sarif
-          ./dbguard review-file ./migrations/latest.sql --policy ./migrations/dbguard.yaml
-        continue-on-error: true
+      - name: Review changed SQL with DBwall
+        id: dbwall
+        uses: ChimdumebiNebolisa/DBwall@v0.2.0
+        with:
+          version: v0.2.0
+          policy: ./examples/dbguard.yaml
+          sql-paths: ${{ steps.changed.outputs.sql-paths }}
+          fail-on-warn: "false"
+          sarif-file: dbwall.sarif
 
       - name: Upload SARIF
+        if: always() && hashFiles('dbwall.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: dbwall.sarif
-
-      - name: Fail on block
-        run: |
-          ./dbguard review-file ./migrations/latest.sql --policy ./migrations/dbguard.yaml --format json > dbwall.json
-          python - <<'PY'
-          import json
-          with open("dbwall.json", "r", encoding="utf-8") as fh:
-              data = json.load(fh)
-          if data["decision"] == "block":
-              raise SystemExit(3)
-          PY
 ```
 
 Notes:
-- Tagged release binaries are the easiest install path for CI.
-- Release binaries are built in core coverage mode. For full PostgreSQL parser-backed coverage, build DBwall from source with `CGO_ENABLED=1`.
-- Use `--format json` for machine decisions and `--format sarif` for code scanning integrations.
+- The reusable action downloads `dbguard_<tag>_linux_amd64_full.tar.gz` (built with `CGO_ENABLED=1`) so multi-object `GRANT`/`DROP`/`TRUNCATE`, joins, and CTE sources are reviewed in `full` coverage mode.
+- Pass every changed `.sql` path through `sql-paths`; the CLI aggregates findings across files into one decision (strictest wins) and emits SARIF with per-file locations.
+- Set `fail-on-warn: "true"` to fail the job on warn findings as well as blocks.
+- Portable core-mode archives (`linux_amd64` without the `_full` suffix) remain available for non-Linux or no-CGO installs, but they are not what this PR gate uses.
