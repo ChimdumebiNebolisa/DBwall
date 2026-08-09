@@ -37,6 +37,9 @@ func Human(res *analyzer.Result, opts ...Options) string {
 		} else if st.Object != "" {
 			b.WriteString(fmt.Sprintf("  Object: %s\n", st.Object))
 		}
+		if st.Location != nil && st.Location.Path != "" {
+			b.WriteString(fmt.Sprintf("  File: %s\n", st.Location.Path))
+		}
 		if st.StartLine > 0 {
 			b.WriteString(fmt.Sprintf("  Start Line: %d\n", st.StartLine))
 		}

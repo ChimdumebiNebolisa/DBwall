@@ -52,7 +52,7 @@ Checks that need `full` mode for accurate relation discovery include:
 - constant-folded trivial predicates beyond `TRUE` and `1 = 1`
 - explicit `semantic_analysis_incomplete` findings for unsupported AST statement types
 
-Release binaries are built with `CGO_ENABLED=0` for portability, so they run in `core` mode unless you build from source with CGO enabled.
+Portable release archives are built with `CGO_ENABLED=0` (`core` mode). Tagged releases also publish a Linux amd64 **full-mode** archive (`dbguard_<tag>_linux_amd64_full.tar.gz`, `CGO_ENABLED=1`) for first-party PR gates.
 
 ## Install
 
@@ -99,6 +99,12 @@ Review a file with policy and machine-readable output:
 ./dbguard review-file ./migrations/latest.sql --policy ./examples/dbguard.yaml --format json
 ```
 
+Review every changed SQL file in one aggregated decision (PR-gate style):
+
+```bash
+./dbguard review-files ./migrations/001.sql ./migrations/002.sql --policy ./examples/dbguard.yaml --format sarif > dbwall.sarif
+```
+
 ## Usage
 
 Human-readable review:
@@ -117,6 +123,12 @@ SARIF for code scanning:
 
 ```bash
 dbguard review-file ./migrations/latest.sql --policy ./dbguard.yaml --format sarif > dbwall.sarif
+```
+
+Multi-file SARIF (per-file locations, one aggregated decision):
+
+```bash
+dbguard review-files ./a.sql ./b.sql --policy ./dbguard.yaml --format sarif > dbwall.sarif
 ```
 
 Version:
@@ -167,7 +179,8 @@ Full example: [examples/dbguard.yaml](examples/dbguard.yaml)
 
 ## Integrations
 
-- GitHub Actions: [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md)
+- Reusable GitHub Action: [`action.yml`](action.yml) (inputs: `version`, `policy`, `sql-paths`, `fail-on-warn`)
+- GitHub Actions example (changed `.sql` PR gate): [examples/GITHUB_ACTION_EXAMPLE.md](examples/GITHUB_ACTION_EXAMPLE.md)
 - Pre-commit: [examples/PRE_COMMIT_EXAMPLE.md](examples/PRE_COMMIT_EXAMPLE.md)
 - Generic CI: [examples/CI_EXAMPLE.md](examples/CI_EXAMPLE.md)
 

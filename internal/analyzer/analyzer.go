@@ -26,7 +26,7 @@ func Analyze(stmts []parser.Statement, p *policy.Policy) *Result {
 		}
 		statementResults = append(statementResults, sr)
 	}
-	decision, severity, summary := aggregate(statementResults)
+	decision, severity, summary := Aggregate(statementResults)
 	return &Result{
 		Decision:   decision,
 		Severity:   severity,
@@ -53,8 +53,8 @@ func convertFindings(statementIndex int, fs []rules.Finding) []Finding {
 	return out
 }
 
-// aggregate returns the overall decision and severity (strictest wins).
-func aggregate(srs []StatementResult) (policy.Decision, Severity, Summary) {
+// Aggregate returns the overall decision and severity (strictest wins).
+func Aggregate(srs []StatementResult) (policy.Decision, Severity, Summary) {
 	var maxDecision policy.Decision
 	var maxSev Severity
 	summary := Summary{Statements: len(srs)}

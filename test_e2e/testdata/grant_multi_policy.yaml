@@ -1,0 +1,9 @@
+dialect: postgres
+
+# Only users is protected. Full mode must still detect the second GRANT target
+# (users) in `GRANT ... ON TABLE orders, users ...` and block.
+protected_tables:
+  - users
+
+rules:
+  grant_to_public_on_protected_objects: block

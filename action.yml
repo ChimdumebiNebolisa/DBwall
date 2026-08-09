@@ -1,0 +1,217 @@
+name: DBwall SQL Review
+description: Scan SQL files with a full-mode DBwall (dbguard) Linux release binary and fail the job on blocking findings.
+author: DBwall
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  version:
+    description: Release tag to download (for example v0.2.0). The tag must publish dbguard_<tag>_linux_amd64_full.tar.gz and checksums.txt.
+    required: true
+  policy:
+    description: Path to the DBwall policy YAML file. Leave empty to use built-in defaults.
+    required: false
+    default: ""
+  sql-paths:
+    description: >
+      Newline-delimited list of .sql files to review. Spaces inside filenames are preserved.
+      Do not separate paths with spaces or commas. Empty input exits successfully with allow
+      and writes a valid SARIF run containing zero results.
+    required: false
+    default: ""
+  fail-on-warn:
+    description: When true, treat warn findings as a job failure (exit code 2).
+    required: false
+    default: "false"
+  github-token:
+    description: Token used to download the release asset from GitHub.
+    required: false
+    default: ${{ github.token }}
+  sarif-file:
+    description: Path to write SARIF output for code scanning upload.
+    required: false
+    default: dbwall.sarif
+
+outputs:
+  decision:
+    description: Aggregated decision (allow, warn, or block).
+    value: ${{ steps.review.outputs.decision }}
+  exit-code:
+    description: dbguard exit code from the review step.
+    value: ${{ steps.review.outputs.exit-code }}
+  sarif-file:
+    description: Path to the generated SARIF file.
+    value: ${{ steps.review.outputs.sarif-file }}
+  sql-count:
+    description: Number of SQL files reviewed.
+    value: ${{ steps.paths.outputs.count }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve SQL paths
+      id: paths
+      shell: bash
+      env:
+        SQL_PATHS_INPUT: ${{ inputs.sql-paths }}
+      run: |
+        set -euo pipefail
+        # Newline-delimited only. Strip CR from CRLF, but never split on spaces.
+        paths=()
+        while IFS= read -r line || [[ -n "${line}" ]]; do
+          line="${line//$'\r'/}"
+          [[ -z "${line}" ]] && continue
+          paths+=("${line}")
+        done < <(printf '%s' "${SQL_PATHS_INPUT}")
+
+        if [[ ${#paths[@]} -eq 0 ]]; then
+          echo "count=0" >> "${GITHUB_OUTPUT}"
+          echo "args=" >> "${GITHUB_OUTPUT}"
+          exit 0
+        fi
+
+        args=()
+        for path in "${paths[@]}"; do
+          if [[ ! -f "${path}" ]]; then
+            echo "SQL path not found: ${path}" >&2
+            exit 1
+          fi
+          args+=("${path}")
+        done
+        {
+          echo "count=${#args[@]}"
+          echo "args<<EOF"
+          printf '%s\n' "${args[@]}"
+          echo "EOF"
+        } >> "${GITHUB_OUTPUT}"
+
+    - name: Download and verify full-mode Linux binary
+      if: steps.paths.outputs.count != '0'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        DBWALL_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        VERSION="${DBWALL_VERSION}"
+        ASSET="dbguard_${VERSION}_linux_amd64_full.tar.gz"
+        BASE_URL="https://github.com/ChimdumebiNebolisa/DBwall/releases/download/${VERSION}"
+        AUTH_HEADER="Authorization: Bearer ${GH_TOKEN}"
+
+        curl -fsSL -H "${AUTH_HEADER}" -o "${ASSET}" "${BASE_URL}/${ASSET}"
+        curl -fsSL -H "${AUTH_HEADER}" -o checksums.txt "${BASE_URL}/checksums.txt"
+
+        if [[ ! -s checksums.txt ]]; then
+          echo "checksums.txt missing or empty; refusing to use unverified binary" >&2
+          exit 1
+        fi
+        if ! grep -F " ${ASSET}" checksums.txt > expected.sha256; then
+          echo "no checksum entry for ${ASSET}; refusing to use unverified binary" >&2
+          exit 1
+        fi
+        if [[ ! -s expected.sha256 ]]; then
+          echo "checksum entry for ${ASSET} is empty; refusing to use unverified binary" >&2
+          exit 1
+        fi
+        sha256sum -c expected.sha256
+
+        tar -xzf "${ASSET}"
+        chmod +x dbguard
+        ./dbguard version
+        MODE="$(./dbguard review-sql 'SELECT 1;' --format json | python3 -c 'import json,sys; print(json.load(sys.stdin).get("coverage_mode",""))')"
+        if [[ "${MODE}" != "full" ]]; then
+          echo "expected coverage_mode=full from linux_amd64_full artifact, got ${MODE}" >&2
+          exit 1
+        fi
+
+    - name: Review SQL files
+      id: review
+      shell: bash
+      env:
+        POLICY_PATH: ${{ inputs.policy }}
+        FAIL_ON_WARN: ${{ inputs.fail-on-warn }}
+        SARIF_FILE: ${{ inputs.sarif-file }}
+        PATH_COUNT: ${{ steps.paths.outputs.count }}
+        PATH_ARGS: ${{ steps.paths.outputs.args }}
+      run: |
+        set -euo pipefail
+        write_empty_sarif() {
+          # Valid SARIF 2.1.0 with one run and zero results (not runs:[] / results:null).
+          cat > "${SARIF_FILE}" <<'EOF'
+        {
+          "version": "2.1.0",
+          "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+          "runs": [
+            {
+              "tool": {
+                "driver": {
+                  "name": "dbguard",
+                  "informationUri": "https://github.com/ChimdumebiNebolisa/DBwall",
+                  "rules": []
+                }
+              },
+              "results": []
+            }
+          ]
+        }
+        EOF
+        }
+
+        if [[ "${PATH_COUNT}" == "0" || -z "${PATH_ARGS}" ]]; then
+          echo "No SQL files to review; reporting allow."
+          write_empty_sarif
+          echo "decision=allow" >> "${GITHUB_OUTPUT}"
+          echo "exit-code=0" >> "${GITHUB_OUTPUT}"
+          echo "sarif-file=${SARIF_FILE}" >> "${GITHUB_OUTPUT}"
+          exit 0
+        fi
+
+        files=()
+        while IFS= read -r line || [[ -n "${line}" ]]; do
+          line="${line//$'\r'/}"
+          [[ -z "${line}" ]] && continue
+          files+=("${line}")
+        done < <(printf '%s' "${PATH_ARGS}")
+
+        if [[ ${#files[@]} -eq 0 ]]; then
+          echo "No SQL files to review; reporting allow."
+          write_empty_sarif
+          echo "decision=allow" >> "${GITHUB_OUTPUT}"
+          echo "exit-code=0" >> "${GITHUB_OUTPUT}"
+          echo "sarif-file=${SARIF_FILE}" >> "${GITHUB_OUTPUT}"
+          exit 0
+        fi
+
+        common=(review-files "${files[@]}")
+        if [[ -n "${POLICY_PATH}" ]]; then
+          common+=(--policy "${POLICY_PATH}")
+        fi
+
+        set +e
+        ./dbguard "${common[@]}" --format sarif > "${SARIF_FILE}"
+        code=$?
+        ./dbguard "${common[@]}" --format json > dbwall.json
+        jcode=$?
+        ./dbguard "${common[@]}" --format human
+        set -e
+
+        if [[ "${jcode}" -ne "${code}" && "${jcode}" -ne 0 && "${code}" -ne 0 ]]; then
+          code="${jcode}"
+        fi
+        decision="$(python3 -c 'import json; print(json.load(open("dbwall.json", encoding="utf-8")).get("decision", "allow"))')"
+
+        echo "decision=${decision}" >> "${GITHUB_OUTPUT}"
+        echo "exit-code=${code}" >> "${GITHUB_OUTPUT}"
+        echo "sarif-file=${SARIF_FILE}" >> "${GITHUB_OUTPUT}"
+
+        if [[ "${code}" -eq 3 ]]; then
+          exit 3
+        fi
+        if [[ "${code}" -eq 2 && "${FAIL_ON_WARN}" == "true" ]]; then
+          exit 2
+        fi
+        if [[ "${code}" -ne 0 && "${code}" -ne 2 ]]; then
+          exit "${code}"
+        fi
+        exit 0

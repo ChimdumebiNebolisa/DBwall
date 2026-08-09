@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/ChimdumebiNebolisa/DBwall/internal/parser"
@@ -49,6 +50,62 @@ func TestCheck_GrantMultipleProtectedTargets(t *testing.T) {
 	}
 	if count != 2 {
 		t.Fatalf("want 2 grant findings, got %d", count)
+	}
+}
+
+func TestCheck_GrantOrdersAndUsersToPublic(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"orders", "users"}}
+	stmt := parser.Statement{
+		Type:            parser.StmtTypeGrant,
+		IsGrantToPublic: true,
+		Relations: []parser.RelationRef{
+			{Name: "orders", Role: parser.RelationTarget},
+			{Name: "users", Role: parser.RelationTarget},
+		},
+	}
+	findings := Check(stmt, p)
+	var hitOrders, hitUsers bool
+	for _, f := range findings {
+		if f.Rule != policy.RuleGrantToPublicProtected {
+			continue
+		}
+		if strings.Contains(f.Message, "orders") {
+			hitOrders = true
+		}
+		if strings.Contains(f.Message, "users") {
+			hitUsers = true
+		}
+	}
+	if !hitOrders || !hitUsers {
+		t.Fatalf("want findings for orders and users, got %#v", findings)
+	}
+}
+
+func TestCheck_GrantMultiOnlyUsersProtected(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{
+		Type:            parser.StmtTypeGrant,
+		IsGrantToPublic: true,
+		Relations: []parser.RelationRef{
+			{Name: "orders", Role: parser.RelationTarget},
+			{Name: "users", Role: parser.RelationTarget},
+		},
+	}
+	findings := Check(stmt, p)
+	var hitUsers bool
+	for _, f := range findings {
+		if f.Rule != policy.RuleGrantToPublicProtected {
+			continue
+		}
+		if strings.Contains(f.Message, "orders") {
+			t.Fatalf("orders is not protected; unexpected finding: %#v", f)
+		}
+		if strings.Contains(f.Message, "users") {
+			hitUsers = true
+		}
+	}
+	if !hitUsers {
+		t.Fatalf("want finding for protected users, got %#v", findings)
 	}
 }
 
@@ -115,4 +172,3 @@ func TestCheck_NestedDeleteRules(t *testing.T) {
 	findings := Check(stmt, policy.DefaultPolicy())
 	requireRuleDecision(t, findings, policy.RuleDeleteWithoutWhere, policy.DecisionBlock)
 }
-

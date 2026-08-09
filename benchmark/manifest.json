@@ -135,7 +135,7 @@
       "id": "block_grant_multi",
       "category": "dangerous",
       "sql_file": "cases/adversarial/grant_multi.sql",
-      "policy_file": "policies/protected_objects.yaml",
+      "policy_file": "policies/grant_multi_protected.yaml",
       "expected_decision": "block",
       "requires_full": true
     },
