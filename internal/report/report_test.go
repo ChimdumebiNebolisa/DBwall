@@ -156,3 +156,49 @@ func TestSARIF_ContainsRuleAndLocation(t *testing.T) {
 		t.Fatalf("SARIF missing source location: %s", out)
 	}
 }
+
+func TestSARIF_UsesPerStatementLocationForMultiFile(t *testing.T) {
+	res := &analyzer.Result{
+		Decision: policy.DecisionBlock,
+		Severity: analyzer.SeverityHigh,
+		Summary:  analyzer.Summary{Statements: 2, Findings: 2, Blocks: 2},
+		Statements: []analyzer.StatementResult{
+			{
+				Index:     1,
+				Type:      "GRANT",
+				Table:     "orders",
+				StartLine: 1,
+				Location:  &analyzer.SourceLocation{Path: "migrations/a.sql", StartLine: 1},
+				Findings: []analyzer.Finding{{
+					Rule:     "grant_to_public_on_protected_objects",
+					Title:    "GRANT to PUBLIC on protected object",
+					Decision: policy.DecisionBlock,
+					Message:  "GRANT exposes a protected object to PUBLIC: orders",
+				}},
+			},
+			{
+				Index:     2,
+				Type:      "DELETE",
+				Table:     "users",
+				StartLine: 3,
+				Location:  &analyzer.SourceLocation{Path: "migrations/b.sql", StartLine: 3},
+				Findings: []analyzer.Finding{{
+					Rule:     "delete_without_where",
+					Title:    "DELETE without WHERE",
+					Decision: policy.DecisionBlock,
+					Message:  "DELETE statement has no WHERE clause",
+				}},
+			},
+		},
+	}
+	out, err := SARIF(res, Options{SourcePath: "ignored.sql"})
+	if err != nil {
+		t.Fatalf("SARIF: %v", err)
+	}
+	if !strings.Contains(out, `"uri": "migrations/a.sql"`) {
+		t.Fatalf("SARIF missing first file location: %s", out)
+	}
+	if !strings.Contains(out, `"uri": "migrations/b.sql"`) {
+		t.Fatalf("SARIF missing second file location: %s", out)
+	}
+}

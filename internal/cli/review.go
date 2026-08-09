@@ -37,29 +37,58 @@ func ReviewSQL(sql string, policyPath string, format string) int {
 
 // ReviewFile runs the full review pipeline on a SQL file and prints output.
 func ReviewFile(filePath string, policyPath string, format string) int {
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "read file:", err)
-		return ExitError
-	}
+	return ReviewFiles([]string{filePath}, policyPath, format)
+}
+
+// ReviewFiles runs the review pipeline across one or more SQL files, aggregates
+// findings into a single decision (strictest wins), and prints output once.
+func ReviewFiles(filePaths []string, policyPath string, format string) int {
 	p, err := loadPolicy(policyPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "policy:", err)
 		return ExitError
 	}
-	stmts, err := parser.Parse(string(data))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "parse:", err)
-		return ExitError
+
+	aggregated := &analyzer.Result{
+		Decision: policy.DecisionAllow,
+		Severity: analyzer.SeverityLow,
 	}
-	res := analyzer.Analyze(stmts, p)
-	for i := range res.Statements {
-		res.Statements[i].Location = &analyzer.SourceLocation{
-			Path:      filePath,
-			StartLine: res.Statements[i].StartLine,
+	if len(filePaths) == 0 {
+		return printAndExit(aggregated, format, report.Options{CoverageMode: parser.CoverageMode()})
+	}
+
+	for _, filePath := range filePaths {
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "read file:", err)
+			return ExitError
+		}
+		stmts, err := parser.Parse(string(data))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "parse:", filePath+":", err)
+			return ExitError
+		}
+		res := analyzer.Analyze(stmts, p)
+		for i := range res.Statements {
+			st := res.Statements[i]
+			st.Location = &analyzer.SourceLocation{
+				Path:      filePath,
+				StartLine: st.StartLine,
+			}
+			st.Index = len(aggregated.Statements) + 1
+			for j := range st.Findings {
+				st.Findings[j].StatementIndex = st.Index
+			}
+			aggregated.Statements = append(aggregated.Statements, st)
 		}
 	}
-	return printAndExit(res, format, report.Options{SourcePath: filePath, CoverageMode: parser.CoverageMode()})
+
+	aggregated.Decision, aggregated.Severity, aggregated.Summary = analyzer.Aggregate(aggregated.Statements)
+	sourcePath := ""
+	if len(filePaths) == 1 {
+		sourcePath = filePaths[0]
+	}
+	return printAndExit(aggregated, format, report.Options{SourcePath: sourcePath, CoverageMode: parser.CoverageMode()})
 }
 
 func loadPolicy(path string) (*policy.Policy, error) {

@@ -16,9 +16,9 @@ type sarifLog struct {
 }
 
 type sarifRun struct {
-	Tool       sarifTool         `json:"tool"`
-	Results    []sarifResult     `json:"results"`
-	Properties map[string]any    `json:"properties,omitempty"`
+	Tool       sarifTool      `json:"tool"`
+	Results    []sarifResult  `json:"results"`
+	Properties map[string]any `json:"properties,omitempty"`
 }
 
 type sarifTool struct {
@@ -114,11 +114,21 @@ func SARIF(res *analyzer.Result, opts Options) (string, error) {
 						"incompleteReasons": st.IncompleteReasons,
 					},
 				}
-				if opts.SourcePath != "" {
+				sourcePath := opts.SourcePath
+				startLine := st.StartLine
+				if st.Location != nil {
+					if st.Location.Path != "" {
+						sourcePath = st.Location.Path
+					}
+					if st.Location.StartLine > 0 {
+						startLine = st.Location.StartLine
+					}
+				}
+				if sourcePath != "" {
 					result.Locations = []sarifLocation{{
 						PhysicalLocation: sarifPhysicalLocation{
-							ArtifactLocation: sarifArtifactLocation{URI: opts.SourcePath},
-							Region:           sarifRegion{StartLine: max(st.StartLine, 1)},
+							ArtifactLocation: sarifArtifactLocation{URI: sourcePath},
+							Region:           sarifRegion{StartLine: max(startLine, 1)},
 						},
 					}}
 				}

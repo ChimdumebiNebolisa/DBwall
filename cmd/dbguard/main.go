@@ -19,6 +19,7 @@ and returns an allow/warn/block decision. Built for developers, CI pipelines, an
 	root.AddCommand(versionCmd())
 	root.AddCommand(reviewSQLCmd())
 	root.AddCommand(reviewFileCmd())
+	root.AddCommand(reviewFilesCmd())
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -52,6 +53,26 @@ func reviewFileCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			code := cli.ReviewFile(args[0], policyPath, format)
+			os.Exit(code)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&policyPath, "policy", "", "Path to policy YAML file")
+	cmd.Flags().StringVar(&format, "format", "human", "Output format: human, json, or sarif")
+	return cmd
+}
+
+func reviewFilesCmd() *cobra.Command {
+	var policyPath, format string
+	cmd := &cobra.Command{
+		Use:   "review-files [path...]",
+		Short: "Review one or more SQL files",
+		Long: `Parse and analyze SQL from multiple files, aggregating findings into a single
+allow/warn/block decision (strictest wins). Empty path lists report allow.
+Use --policy to load a YAML policy file.`,
+		Args: cobra.ArbitraryArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			code := cli.ReviewFiles(args, policyPath, format)
 			os.Exit(code)
 			return nil
 		},
