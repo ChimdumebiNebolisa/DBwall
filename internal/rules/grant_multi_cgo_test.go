@@ -49,6 +49,40 @@ func TestFullMode_GrantOrdersAndUsersToPublic(t *testing.T) {
 	}
 }
 
+func TestFullMode_GrantMultiOnlyUsersProtected(t *testing.T) {
+	const sql = `GRANT SELECT ON TABLE orders, users TO PUBLIC;`
+	stmts, err := parser.Parse(sql)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(stmts) != 1 {
+		t.Fatalf("want 1 statement, got %d", len(stmts))
+	}
+	names := stmts[0].AllRelationNames()
+	if !containsAllNames(names, "orders", "users") {
+		t.Fatalf("full mode must see both grant targets, got %#v", stmts[0].Relations)
+	}
+
+	// Only the second relation is protected — core/first-target-only parsers miss this.
+	p := &policy.Policy{
+		Dialect:         policy.DialectPostgres,
+		ProtectedTables: []string{"users"},
+	}
+	findings := Check(stmts[0], p)
+	var hitUsers bool
+	for _, f := range findings {
+		if f.Rule == policy.RuleGrantToPublicProtected && strings.Contains(f.Message, "users") {
+			hitUsers = true
+		}
+		if f.Rule == policy.RuleGrantToPublicProtected && strings.Contains(f.Message, "orders") {
+			t.Fatalf("orders is not protected; unexpected finding: %#v", f)
+		}
+	}
+	if !hitUsers {
+		t.Fatalf("want finding for protected users (second GRANT target), got %#v", findings)
+	}
+}
+
 func containsAllNames(have []string, want ...string) bool {
 	set := map[string]struct{}{}
 	for _, h := range have {

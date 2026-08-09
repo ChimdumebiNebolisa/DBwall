@@ -155,6 +155,18 @@
     "sql": "GRANT SELECT ON TABLE orders, users TO PUBLIC;",
     "policy": {
       "dialect": "postgres",
+      "protected_tables": ["users"]
+    },
+    "decision": "block",
+    "expected_rules": ["grant_to_public_on_protected_objects"]
+  },
+  {
+    "id": "dangerous_public_grant_multi_both_protected",
+    "category": "dangerous",
+    "requires_full": true,
+    "sql": "GRANT SELECT ON TABLE orders, users TO PUBLIC;",
+    "policy": {
+      "dialect": "postgres",
       "protected_tables": ["orders", "users"]
     },
     "decision": "block",

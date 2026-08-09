@@ -72,10 +72,15 @@ func TestCLIReviewFilesGrantMultiProtected(t *testing.T) {
 		t.Fatalf("want exit 3, got %d output=%s", code, out)
 	}
 	text := string(out)
-	if !strings.Contains(text, "orders") || !strings.Contains(text, "users") {
-		t.Fatalf("expected findings mentioning orders and users, got %s", text)
+	// Policy protects only users. If full mode only saw the first GRANT target
+	// (orders), this would incorrectly allow — so users must appear in findings.
+	if !strings.Contains(text, "users") {
+		t.Fatalf("expected finding mentioning protected users, got %s", text)
 	}
 	if !strings.Contains(text, "grant_to_public_on_protected_objects") {
 		t.Fatalf("expected grant rule, got %s", text)
+	}
+	if !strings.Contains(text, "GRANT exposes a protected object to PUBLIC: users") {
+		t.Fatalf("expected users protected-object finding, got %s", text)
 	}
 }

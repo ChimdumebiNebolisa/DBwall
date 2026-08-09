@@ -81,6 +81,34 @@ func TestCheck_GrantOrdersAndUsersToPublic(t *testing.T) {
 	}
 }
 
+func TestCheck_GrantMultiOnlyUsersProtected(t *testing.T) {
+	p := &policy.Policy{Dialect: policy.DialectPostgres, ProtectedTables: []string{"users"}}
+	stmt := parser.Statement{
+		Type:            parser.StmtTypeGrant,
+		IsGrantToPublic: true,
+		Relations: []parser.RelationRef{
+			{Name: "orders", Role: parser.RelationTarget},
+			{Name: "users", Role: parser.RelationTarget},
+		},
+	}
+	findings := Check(stmt, p)
+	var hitUsers bool
+	for _, f := range findings {
+		if f.Rule != policy.RuleGrantToPublicProtected {
+			continue
+		}
+		if strings.Contains(f.Message, "orders") {
+			t.Fatalf("orders is not protected; unexpected finding: %#v", f)
+		}
+		if strings.Contains(f.Message, "users") {
+			hitUsers = true
+		}
+	}
+	if !hitUsers {
+		t.Fatalf("want finding for protected users, got %#v", findings)
+	}
+}
+
 func TestCheck_SemanticAnalysisIncomplete(t *testing.T) {
 	stmt := parser.Statement{
 		Type:              parser.StmtTypeOther,

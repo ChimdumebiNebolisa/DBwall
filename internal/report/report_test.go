@@ -157,6 +157,30 @@ func TestSARIF_ContainsRuleAndLocation(t *testing.T) {
 	}
 }
 
+func TestSARIF_EmptyResultEmitsOneRunZeroResults(t *testing.T) {
+	out, err := SARIF(&analyzer.Result{Decision: policy.DecisionAllow, Severity: analyzer.SeverityLow}, Options{CoverageMode: "core"})
+	if err != nil {
+		t.Fatalf("SARIF: %v", err)
+	}
+	var parsed struct {
+		Runs []struct {
+			Results []json.RawMessage `json:"results"`
+		} `json:"runs"`
+	}
+	if err := json.Unmarshal([]byte(out), &parsed); err != nil {
+		t.Fatalf("parse SARIF: %v", err)
+	}
+	if len(parsed.Runs) != 1 {
+		t.Fatalf("want 1 run, got %d", len(parsed.Runs))
+	}
+	if parsed.Runs[0].Results == nil {
+		t.Fatal("results must be an empty array, not null")
+	}
+	if len(parsed.Runs[0].Results) != 0 {
+		t.Fatalf("want 0 results, got %d", len(parsed.Runs[0].Results))
+	}
+}
+
 func TestSARIF_UsesPerStatementLocationForMultiFile(t *testing.T) {
 	res := &analyzer.Result{
 		Decision: policy.DecisionBlock,

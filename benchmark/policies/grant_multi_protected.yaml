@@ -1,7 +1,8 @@
 dialect: postgres
 
+# Only users is protected so the multi-object GRANT regression requires detecting
+# the second relation (users), not merely the first (orders).
 protected_tables:
-  - orders
   - users
 
 rules:

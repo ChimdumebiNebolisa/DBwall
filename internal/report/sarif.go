@@ -97,6 +97,9 @@ func SARIF(res *analyzer.Result, opts Options) (string, error) {
 				InformationURI: "https://github.com/ChimdumebiNebolisa/DBwall",
 				Rules:          rules,
 			}},
+			// Always emit an explicit empty array so code-scanning upload accepts
+			// no-finding / no-SQL runs (nil would marshal as null).
+			Results: []sarifResult{},
 			Properties: map[string]any{
 				"coverageMode": opts.CoverageMode,
 			},

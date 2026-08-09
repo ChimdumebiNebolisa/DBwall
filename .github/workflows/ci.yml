@@ -60,3 +60,53 @@ jobs:
 
       - name: govulncheck
         run: govulncheck ./...
+
+  action-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install actionlint
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="1.7.7"
+          curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz" -o actionlint.tar.gz
+          tar -xzf actionlint.tar.gz actionlint
+          sudo mv actionlint /usr/local/bin/actionlint
+          actionlint -version
+
+      - name: Lint workflows and action.yml
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Validate workflow YAML/shell and the composite action metadata/scripts.
+          actionlint -color
+          # Explicit metadata presence check for the reusable action.
+          test -f action.yml
+          python3 - <<'PY'
+          import sys
+          try:
+              import yaml
+          except ImportError:
+              import subprocess
+              subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "pyyaml"])
+              import yaml
+          with open("action.yml", encoding="utf-8") as fh:
+              data = yaml.safe_load(fh)
+          assert data.get("name"), "action.yml missing name"
+          assert data.get("runs", {}).get("using") == "composite", "action.yml must be composite"
+          inputs = data.get("inputs", {})
+          assert "sql-paths" in inputs, "sql-paths input required"
+          desc = inputs["sql-paths"].get("description", "")
+          assert "Newline" in desc or "newline" in desc, "sql-paths must document newline-delimited input"
+          assert "version" in inputs and inputs["version"].get("required") is True
+          print("action.yml metadata OK")
+          PY
+
+      - name: Validate action path parsing and shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/test_action_path_parse.sh
+          ./scripts/test_action_path_parse.sh
