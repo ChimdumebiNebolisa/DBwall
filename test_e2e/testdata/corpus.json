@@ -155,7 +155,7 @@
     "sql": "GRANT SELECT ON TABLE orders, users TO PUBLIC;",
     "policy": {
       "dialect": "postgres",
-      "protected_tables": ["users"]
+      "protected_tables": ["orders", "users"]
     },
     "decision": "block",
     "expected_rules": ["grant_to_public_on_protected_objects"]

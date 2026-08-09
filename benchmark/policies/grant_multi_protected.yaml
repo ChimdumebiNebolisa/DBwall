@@ -1,0 +1,8 @@
+dialect: postgres
+
+protected_tables:
+  - orders
+  - users
+
+rules:
+  grant_to_public_on_protected_objects: block
