@@ -101,13 +101,14 @@ func extractSelectBody(stmt *Statement, node *pg_query.SelectStmt, cteNames map[
 		walkWithClauseInto(stmt, node.WithClause, cteNames)
 	}
 	if node.Op != pg_query.SetOperation_SET_OPERATION_UNDEFINED && node.Op != pg_query.SetOperation_SETOP_NONE {
+		// Arm recursion must not leak per-arm LIMIT into the parent: an arm's
+		// own LIMIT bounds only that arm's contribution (audit finding F-002).
+		hadLimit := stmt.HasLimit
 		extractSelectBody(stmt, node.Larg, cteNames)
 		extractSelectBody(stmt, node.Rarg, cteNames)
-		// Outer set-operation nodes still own LIMIT / projection metadata.
+		stmt.HasLimit = hadLimit || node.LimitCount != nil ||
+			(selectArmBounded(node.Larg) && selectArmBounded(node.Rarg))
 		stmt.SelectAll = stmt.SelectAll || selectListHasStar(node.TargetList)
-		if node.LimitCount != nil {
-			stmt.HasLimit = true
-		}
 		return
 	}
 	stmt.SelectAll = selectListHasStar(node.TargetList)
@@ -124,6 +125,16 @@ func extractSelectBody(stmt *Statement, node *pg_query.SelectStmt, cteNames map[
 	for _, target := range node.TargetList {
 		walkExpressionRelations(stmt, target, RelationRead, cteNames)
 	}
+}
+
+func selectArmBounded(node *pg_query.SelectStmt) bool {
+	if node == nil {
+		return false
+	}
+	if node.Op != pg_query.SetOperation_SET_OPERATION_UNDEFINED && node.Op != pg_query.SetOperation_SETOP_NONE {
+		return selectArmBounded(node.Larg) && selectArmBounded(node.Rarg)
+	}
+	return node.LimitCount != nil
 }
 
 func extractInsert(stmt *Statement, node *pg_query.InsertStmt) {
@@ -241,15 +252,73 @@ func extractAlterDefaultPrivileges(stmt *Statement, node *pg_query.AlterDefaultP
 }
 
 func extractGrant(stmt *Statement, node *pg_query.GrantStmt) {
-	stmt.Type = StmtTypeGrant
-	if node == nil {
-		markIncomplete(stmt, AnalysisPartial, "missing_grant_node")
+	// PostgreSQL represents both GRANT and REVOKE with GrantStmt; IsGrant
+	// distinguishes them. Treating REVOKE as a grant inverted the security
+	// decision (audit finding F-001).
+	if node == nil || !node.IsGrant {
+		extractRevoke(stmt, node)
 		return
 	}
+	stmt.Type = StmtTypeGrant
 	applyGrantCommon(stmt, node)
 }
 
+func extractRevoke(stmt *Statement, node *pg_query.GrantStmt) {
+	stmt.Type = StmtTypeRevoke
+	if node == nil {
+		markIncomplete(stmt, AnalysisPartial, "missing_revoke_node")
+		return
+	}
+	for _, g := range node.Grantees {
+		name, _, ok := roleSpecName(g.GetRoleSpec())
+		if ok && name != "" {
+			stmt.Grantees = append(stmt.Grantees, name)
+		}
+	}
+	switch node.Objtype {
+	case pg_query.ObjectType_OBJECT_TABLE:
+		for _, obj := range node.Objects {
+			if rv := obj.GetRangeVar(); rv != nil {
+				addRangeVar(stmt, rv, RelationTarget)
+			} else {
+				markIncomplete(stmt, AnalysisPartial, "revoke_table_unrecognized_object")
+			}
+		}
+	case pg_query.ObjectType_OBJECT_SCHEMA:
+		for _, obj := range node.Objects {
+			name, _, ok := objectNameFromNode(obj)
+			if !ok {
+				markIncomplete(stmt, AnalysisPartial, "revoke_schema_unrecognized_object")
+				continue
+			}
+			stmt.Schema = name
+			stmt.Object = name
+		}
+	default:
+		if len(node.Objects) > 0 {
+			markIncomplete(stmt, AnalysisPartial, "revoke_partial_object_type")
+		}
+	}
+}
+
 func extractGrantRole(stmt *Statement, node *pg_query.GrantRoleStmt) {
+	// REVOKE role membership shares GrantRoleStmt with GRANT; honor IsGrant
+	// so revoking a high-risk role is not reported as granting it (F-001).
+	if node == nil || !node.IsGrant {
+		stmt.Type = StmtTypeRevoke
+		stmt.IsRoleMembershipRevoke = true
+		if node == nil {
+			markIncomplete(stmt, AnalysisPartial, "missing_revoke_role_node")
+			return
+		}
+		for _, g := range node.GranteeRoles {
+			name, _, ok := roleSpecName(g.GetRoleSpec())
+			if ok && name != "" {
+				stmt.Grantees = append(stmt.Grantees, name)
+			}
+		}
+		return
+	}
 	stmt.Type = StmtTypeGrant
 	stmt.IsRoleMembershipGrant = true
 	if node == nil {
@@ -314,6 +383,17 @@ func applyGrantCommon(stmt *Statement, node *pg_query.GrantStmt) {
 			stmt.Schema = name
 			stmt.Object = name
 			addRelation(stmt, name, "", RelationTarget)
+		}
+	case pg_query.ObjectType_OBJECT_DATABASE:
+		for _, obj := range node.Objects {
+			name, _, ok := objectNameFromNode(obj)
+			if !ok {
+				markIncomplete(stmt, AnalysisPartial, "grant_database_unrecognized_object")
+				continue
+			}
+			// Database-level grants are not protected-object checks today;
+			// record the object without inventing a table-like relation.
+			stmt.Object = name
 		}
 	default:
 		if node.Targtype == pg_query.GrantTargetType_ACL_TARGET_ALL_IN_SCHEMA {

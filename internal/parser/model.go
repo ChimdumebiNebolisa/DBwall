@@ -21,6 +21,7 @@ const (
 	StmtTypeSelect                 StmtType = "SELECT"
 	StmtTypeInsert                 StmtType = "INSERT"
 	StmtTypeGrant                  StmtType = "GRANT"
+	StmtTypeRevoke                 StmtType = "REVOKE"
 	StmtTypeTruncate               StmtType = "TRUNCATE"
 	StmtTypeCopy                   StmtType = "COPY"
 	StmtTypeOther                  StmtType = "OTHER"
@@ -98,6 +99,7 @@ type Statement struct {
 	CopyToProgram         bool
 	IsGrantToPublic       bool
 	IsRoleMembershipGrant bool
+	IsRoleMembershipRevoke bool
 	GrantedRoles          []string
 	Grantees              []string
 	Nested                []Statement

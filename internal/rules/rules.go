@@ -293,8 +293,11 @@ func checkSemanticAnalysisIncomplete(stmt parser.Statement, p *policy.Policy) *F
 func actionableIncompleteReasons(reasons []string) []string {
 	var out []string
 	for _, reason := range reasons {
+		// core_mode_token_parser alone only marks the portable parser's blanket
+		// partial status; it must not fire per-statement findings. Unsupported
+		// statement shapes DO surface, in both modes (audit finding F-005).
 		switch reason {
-		case "core_mode_token_parser", "unsupported_statement_in_core_mode":
+		case "core_mode_token_parser":
 			continue
 		default:
 			out = append(out, reason)

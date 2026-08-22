@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 type sqlSegment struct {
 	SQL       string
 	StartLine int
+}
+
+// stripUTF8BOM removes a leading UTF-8 byte-order mark so BOM-prefixed files
+// parse instead of failing with an opaque syntax error (audit finding F-006).
+func stripUTF8BOM(sql string) string {
+	return strings.TrimPrefix(sql, "\uFEFF")
 }
 
 func splitSQLStatementsWithLines(sql string) ([]sqlSegment, error) {
@@ -18,6 +25,9 @@ func splitSQLStatementsWithLines(sql string) ([]sqlSegment, error) {
 	line := 1
 	segmentLine := 1
 	segmentStarted := false
+	// segmentHasContent tracks whether the current segment contains any real SQL
+	// outside comments; a trailing comment must not become a phantom statement.
+	segmentHasContent := false
 	inSingle := false
 	inDouble := false
 	inLineComment := false
@@ -115,17 +125,20 @@ func splitSQLStatementsWithLines(sql string) ([]sqlSegment, error) {
 		}
 		if ch == '\'' {
 			current.WriteByte(ch)
+			segmentHasContent = true
 			inSingle = true
 			continue
 		}
 		if ch == '"' {
 			current.WriteByte(ch)
+			segmentHasContent = true
 			inDouble = true
 			continue
 		}
 		if ch == '$' {
 			if tag := readDollarTag(sql[i:]); tag != "" {
 				current.WriteString(tag)
+				segmentHasContent = true
 				i += len(tag) - 1
 				dollarTag = tag
 				continue
@@ -133,15 +146,19 @@ func splitSQLStatementsWithLines(sql string) ([]sqlSegment, error) {
 		}
 		if ch == ';' {
 			stmt := strings.TrimSpace(current.String())
-			if stmt != "" {
+			if stmt != "" && segmentHasContent {
 				out = append(out, sqlSegment{SQL: stmt, StartLine: segmentLine})
 			}
 			current.Reset()
 			segmentStarted = false
+			segmentHasContent = false
 			continue
 		}
 
 		current.WriteByte(ch)
+		if !unicode.IsSpace(rune(ch)) {
+			segmentHasContent = true
+		}
 		if ch == '\n' {
 			line++
 		}
@@ -152,7 +169,7 @@ func splitSQLStatementsWithLines(sql string) ([]sqlSegment, error) {
 	}
 
 	stmt := strings.TrimSpace(current.String())
-	if stmt != "" {
+	if stmt != "" && segmentHasContent {
 		out = append(out, sqlSegment{SQL: stmt, StartLine: segmentLine})
 	}
 	return out, nil
@@ -197,6 +214,8 @@ func parseStatementText(sql string, startLine int) (Statement, error) {
 		out, parseErr = parseTruncateTokens(tokens, stmt)
 	case "GRANT":
 		out, parseErr = parseGrantTokens(tokens, stmt)
+	case "REVOKE":
+		out, parseErr = parseRevokeTokens(tokens, stmt)
 	case "COPY":
 		out, parseErr = parseCopyTokens(tokens, stmt)
 	default:
@@ -206,6 +225,9 @@ func parseStatementText(sql string, startLine int) (Statement, error) {
 		return Statement{}, parseErr
 	}
 	if out.Type == StmtTypeOther {
+		// Actionable reason: unsupported statement shapes must surface as
+		// semantic_analysis_incomplete in core mode too, matching full mode
+		// (audit finding F-005). Previously this was silently filtered.
 		markIncomplete(&out, AnalysisUnsupported, "unsupported_statement_in_core_mode")
 	}
 	syncConvenienceFields(&out)
@@ -227,7 +249,7 @@ func parseDeleteTokens(tokens []string, stmt Statement) (Statement, error) {
 		return Statement{}, err
 	}
 	stmt.Type = StmtTypeDelete
-	stmt.HasWhere = containsKeyword(tokens, "WHERE")
+	stmt.HasWhere = containsKeywordTopLevel(tokens, "WHERE")
 	stmt.WhereTrivial = trivialWhereTokens(tokens)
 	setRelation(&stmt, table)
 	return stmt, nil
@@ -242,11 +264,12 @@ func parseUpdateTokens(tokens []string, stmt Statement) (Statement, error) {
 	if err != nil {
 		return Statement{}, err
 	}
-	if !containsKeyword(tokens[next:], "SET") {
+	setIndex := indexKeywordTopLevelFrom(tokens, next, "SET")
+	if setIndex < 0 {
 		return Statement{}, fmt.Errorf("syntax error: UPDATE missing SET clause")
 	}
 	stmt.Type = StmtTypeUpdate
-	stmt.HasWhere = containsKeyword(tokens, "WHERE")
+	stmt.HasWhere = containsKeywordTopLevel(tokens, "WHERE")
 	stmt.WhereTrivial = trivialWhereTokens(tokens)
 	setRelation(&stmt, table)
 	return stmt, nil
@@ -263,12 +286,27 @@ func parseDropTokens(tokens []string, stmt Statement) (Statement, error) {
 		if tokenIs(tokens, pos, "IF") && tokenIs(tokens, pos+1, "EXISTS") {
 			pos += 2
 		}
-		name, _, err := parseQualifiedIdentifier(tokens, pos)
-		if err != nil {
-			return Statement{}, err
-		}
 		stmt.Type = StmtTypeDropTable
-		setRelation(&stmt, name)
+		first := ""
+		for pos < len(tokens) {
+			name, next, err := parseQualifiedIdentifier(tokens, pos)
+			if err != nil {
+				break
+			}
+			if first == "" {
+				first = name
+			}
+			setRelation(&stmt, name)
+			pos = next
+			if pos < len(tokens) && tokens[pos] == "," {
+				pos++
+				continue
+			}
+			break
+		}
+		if first == "" {
+			return Statement{}, syntaxNear(tokens, pos)
+		}
 		return stmt, nil
 	case "SCHEMA":
 		pos++
@@ -341,9 +379,9 @@ func parseAlterTokens(tokens []string, stmt Statement) (Statement, error) {
 
 func parseSelectTokens(tokens []string, stmt Statement) Statement {
 	stmt.Type = StmtTypeSelect
-	stmt.HasWhere = containsKeyword(tokens, "WHERE")
-	stmt.HasLimit = containsKeyword(tokens, "LIMIT")
-	if from := indexKeyword(tokens, "FROM"); from >= 0 {
+	stmt.HasWhere = containsKeywordTopLevel(tokens, "WHERE")
+	stmt.HasLimit = hasLimitClauseTopLevel(tokens)
+	if from := indexKeywordTopLevel(tokens, "FROM"); from >= 0 {
 		stmt.SelectAll = containsStarProjection(tokens[1:from])
 		if from+1 < len(tokens) {
 			if name, _, err := parseQualifiedIdentifier(tokens, from+1); err == nil {
@@ -375,24 +413,42 @@ func parseTruncateTokens(tokens []string, stmt Statement) (Statement, error) {
 	if tokenIs(tokens, pos, "TABLE") {
 		pos++
 	}
-	table, _, err := parseQualifiedIdentifier(tokens, pos)
-	if err != nil {
-		return Statement{}, err
+	if tokenIs(tokens, pos, "ONLY") {
+		pos++
 	}
 	stmt.Type = StmtTypeTruncate
-	setRelation(&stmt, table)
+	first := ""
+	for pos < len(tokens) {
+		name, next, err := parseQualifiedIdentifier(tokens, pos)
+		if err != nil {
+			break
+		}
+		if first == "" {
+			first = name
+		}
+		setRelation(&stmt, name)
+		pos = next
+		if pos < len(tokens) && tokens[pos] == "," {
+			pos++
+			continue
+		}
+		break
+	}
+	if first == "" {
+		return Statement{}, syntaxNear(tokens, pos)
+	}
 	return stmt, nil
 }
 
 func parseGrantTokens(tokens []string, stmt Statement) (Statement, error) {
-	toIdx := indexKeyword(tokens, "TO")
+	toIdx := indexKeywordTopLevel(tokens, "TO")
 	if toIdx < 0 {
 		return Statement{}, fmt.Errorf("syntax error at or near %q", "GRANT")
 	}
 	stmt.Type = StmtTypeGrant
 	stmt.Grantees = parseIdentifiersUntil(tokens, toIdx+1, "WITH", "GRANTED", "BY")
 	stmt.IsGrantToPublic = containsIdentifier(stmt.Grantees, "public")
-	onIdx := indexKeyword(tokens, "ON")
+	onIdx := indexKeywordTopLevel(tokens, "ON")
 	if onIdx >= 0 && onIdx < toIdx {
 		parseGrantObject(tokens, onIdx+1, toIdx, &stmt)
 		return stmt, nil
@@ -402,32 +458,76 @@ func parseGrantTokens(tokens []string, stmt Statement) (Statement, error) {
 	return stmt, nil
 }
 
+func parseRevokeTokens(tokens []string, stmt Statement) (Statement, error) {
+	// REVOKE is recognized so privilege revocations do not fail the gate or get
+	// misread as grants (audit finding F-001). No rules act on revokes yet.
+	fromIdx := indexKeywordTopLevel(tokens, "FROM")
+	if fromIdx < 0 {
+		return Statement{}, fmt.Errorf("syntax error at or near %q", "REVOKE")
+	}
+	stmt.Type = StmtTypeRevoke
+	stmt.IsRoleMembershipRevoke = !containsKeywordTopLevel(tokens[:fromIdx], "ON")
+	stmt.Grantees = parseIdentifiersUntil(tokens, fromIdx+1, "CASCADE", "RESTRICT")
+	return stmt, nil
+}
+
 func parseGrantObject(tokens []string, start, end int, stmt *Statement) {
 	i := start
+	sawObject := false
 	for i < end {
 		switch upper(tokens[i]) {
-		case "TABLE", "TABLES", "SEQUENCE", "SEQUENCES", "FUNCTION", "FUNCTIONS", "ON", "ALL":
-			i++
-			continue
-		case "IN":
+		case "TABLE", "TABLES", "SEQUENCE", "SEQUENCES", "FUNCTION", "FUNCTIONS", "ON", "ALL", "PRIVILEGES", "IN":
 			i++
 			continue
 		case "SCHEMA":
-			if i+1 < end {
-				if name, _, err := parseQualifiedIdentifier(tokens, i+1); err == nil {
-					stmt.Schema = name
-					stmt.Object = name
+			i++
+			for i < end {
+				name, next, err := parseQualifiedIdentifier(tokens, i)
+				if err != nil {
 					return
 				}
+				addRelationQualified(stmt, name, RelationTarget)
+				if stmt.Schema == "" {
+					stmt.Schema = name
+					stmt.Object = name
+				}
+				i = next
+				if i < end && tokens[i] == "," {
+					i++
+					continue
+				}
+				break
 			}
-			i++
+			return
+		case "DATABASE":
+			// Database-level grants are not protected-object checks today; record
+			// the object name without inventing a relation (audit finding F-018).
+			if i+1 < end {
+				if name, _, err := parseQualifiedIdentifier(tokens, i+1); err == nil {
+					stmt.Object = name
+				}
+			}
+			return
+		case "TO":
+			return
 		default:
-			if name, _, err := parseQualifiedIdentifier(tokens, i); err == nil {
-				setRelation(stmt, name)
-				return
+			name, next, err := parseQualifiedIdentifier(tokens, i)
+			if err != nil {
+				i++
+				continue
 			}
-			i++
+			setRelation(stmt, name)
+			sawObject = true
+			i = next
+			if i < end && tokens[i] == "," {
+				i++
+				continue
+			}
+			continue
 		}
+	}
+	if !sawObject && len(stmt.Relations) == 0 && stmt.Schema != "" {
+		stmt.Object = stmt.Schema
 	}
 }
 
@@ -459,19 +559,26 @@ func tokenizeSQL(sql string) ([]string, error) {
 	var tokens []string
 
 	for i := 0; i < len(sql); {
-		ch := rune(sql[i])
-		if unicode.IsSpace(ch) {
+		ch, width := utf8.DecodeRuneInString(sql[i:])
+		if ch == utf8.RuneError && width == 1 {
+			// Invalid UTF-8 byte: treat as an opaque single-byte token so the
+			// statement fails closed downstream instead of corrupting names.
+			tokens = append(tokens, sql[i:i+1])
 			i++
 			continue
 		}
-		if sql[i] == '-' && i+1 < len(sql) && sql[i+1] == '-' {
+		if unicode.IsSpace(ch) {
+			i += width
+			continue
+		}
+		if ch == '-' && i+1 < len(sql) && sql[i+1] == '-' {
 			i += 2
 			for i < len(sql) && sql[i] != '\n' {
 				i++
 			}
 			continue
 		}
-		if sql[i] == '/' && i+1 < len(sql) && sql[i+1] == '*' {
+		if ch == '/' && i+1 < len(sql) && sql[i+1] == '*' {
 			i += 2
 			closed := false
 			for i+1 < len(sql) {
@@ -487,7 +594,7 @@ func tokenizeSQL(sql string) ([]string, error) {
 			}
 			continue
 		}
-		if sql[i] == '\'' {
+		if ch == '\'' {
 			token, next, err := readSingleQuoted(sql, i)
 			if err != nil {
 				return nil, err
@@ -496,7 +603,7 @@ func tokenizeSQL(sql string) ([]string, error) {
 			i = next
 			continue
 		}
-		if sql[i] == '"' {
+		if ch == '"' {
 			token, next, err := readDoubleQuoted(sql, i)
 			if err != nil {
 				return nil, err
@@ -505,7 +612,7 @@ func tokenizeSQL(sql string) ([]string, error) {
 			i = next
 			continue
 		}
-		if sql[i] == '$' {
+		if ch == '$' {
 			if tag := readDollarTag(sql[i:]); tag != "" {
 				next := strings.Index(sql[i+len(tag):], tag)
 				if next < 0 {
@@ -519,34 +626,38 @@ func tokenizeSQL(sql string) ([]string, error) {
 		}
 		if isIdentifierStart(ch) {
 			start := i
-			i++
-			for i < len(sql) && isIdentifierPart(rune(sql[i])) {
-				i++
+			i += width
+			for i < len(sql) {
+				r, w := utf8.DecodeRuneInString(sql[i:])
+				if !isIdentifierPart(r) {
+					break
+				}
+				i += w
 			}
 			tokens = append(tokens, sql[start:i])
 			continue
 		}
 		if unicode.IsDigit(ch) {
 			start := i
-			i++
+			i += width
 			for i < len(sql) {
-				r := rune(sql[i])
+				r, w := utf8.DecodeRuneInString(sql[i:])
 				if !(unicode.IsDigit(r) || r == '.') {
 					break
 				}
-				i++
+				i += w
 			}
 			tokens = append(tokens, sql[start:i])
 			continue
 		}
 		if strings.ContainsRune("(),.*=;", ch) {
-			tokens = append(tokens, sql[i:i+1])
-			i++
+			tokens = append(tokens, sql[i:i+width])
+			i += width
 			continue
 		}
 		if unicode.IsPunct(ch) || unicode.IsSymbol(ch) {
-			tokens = append(tokens, sql[i:i+1])
-			i++
+			tokens = append(tokens, sql[i:i+width])
+			i += width
 			continue
 		}
 		return nil, fmt.Errorf("syntax error at or near %q", string(ch))
@@ -641,22 +752,41 @@ func containsStarProjection(tokens []string) bool {
 }
 
 func trivialWhereTokens(tokens []string) bool {
-	idx := indexKeyword(tokens, "WHERE")
+	idx := indexKeywordTopLevel(tokens, "WHERE")
 	if idx < 0 {
 		return false
 	}
 	var clause []string
+	depth := 0
 	for _, token := range tokens[idx+1:] {
-		up := upper(token)
-		if up == "RETURNING" || up == "LIMIT" || up == "ORDER" {
-			break
+		switch token {
+		case "(":
+			depth++
+		case ")":
+			if depth > 0 {
+				depth--
+			}
+		default:
+			if depth == 0 {
+				up := upper(token)
+				switch up {
+				case "RETURNING", "LIMIT", "FETCH", "ORDER", "FOR":
+					clause = stripOuterParens(clause)
+					return clauseIsTrivial(clause)
+				case ";":
+					continue
+				}
+				clause = append(clause, up)
+			} else {
+				clause = append(clause, upper(token))
+			}
 		}
-		if token == ";" {
-			continue
-		}
-		clause = append(clause, up)
 	}
 	clause = stripOuterParens(clause)
+	return clauseIsTrivial(clause)
+}
+
+func clauseIsTrivial(clause []string) bool {
 	switch {
 	case len(clause) == 1 && clause[0] == "TRUE":
 		return true
@@ -676,6 +806,66 @@ func stripOuterParens(tokens []string) []string {
 
 func containsKeyword(tokens []string, keyword string) bool {
 	return indexKeyword(tokens, keyword) >= 0
+}
+
+// indexKeywordTopLevel finds a keyword outside any parenthesis group. Keywords
+// inside subqueries or CTE bodies must not satisfy outer-clause checks such as
+// WHERE presence or LIMIT bounding (audit findings F-003 and F-008).
+func indexKeywordTopLevel(tokens []string, keyword string) int {
+	return indexKeywordTopLevelFrom(tokens, 0, keyword)
+}
+
+func indexKeywordTopLevelFrom(tokens []string, start int, keyword string) int {
+	depth := 0
+	for i := start; i < len(tokens); i++ {
+		switch tokens[i] {
+		case "(":
+			depth++
+		case ")":
+			if depth > 0 {
+				depth--
+			}
+		default:
+			if depth == 0 && upper(tokens[i]) == keyword {
+				return i
+			}
+		}
+	}
+	return -1
+}
+
+func containsKeywordTopLevel(tokens []string, keyword string) bool {
+	return indexKeywordTopLevel(tokens, keyword) >= 0
+}
+
+// hasLimitClauseTopLevel reports whether the statement is bounded by a
+// top-level LIMIT clause or SQL-standard FETCH FIRST/NEXT ... ROW[S] form
+// (audit finding F-010).
+func hasLimitClauseTopLevel(tokens []string) bool {
+	if containsKeywordTopLevel(tokens, "LIMIT") {
+		return true
+	}
+	fetch := indexKeywordTopLevel(tokens, "FETCH")
+	if fetch < 0 || fetch+1 >= len(tokens) {
+		return false
+	}
+	first := upper(tokens[fetch+1])
+	if first != "FIRST" && first != "NEXT" && first != "ROW" && first != "ROWS" {
+		return false
+	}
+	for i := fetch + 1; i < len(tokens); i++ {
+		up := upper(tokens[i])
+		if up == "ROW" || up == "ROWS" {
+			return true
+		}
+		switch up {
+		case "ONLY":
+			return false
+		case "WITH", "TIES":
+			return true // WITH TIES still bounds via FETCH
+		}
+	}
+	return false
 }
 
 func indexKeyword(tokens []string, keyword string) int {
@@ -736,14 +926,16 @@ func readDollarTag(sql string) string {
 	if !strings.HasPrefix(sql, "$") {
 		return ""
 	}
-	for i := 1; i < len(sql); i++ {
-		ch := rune(sql[i])
+	i := 1
+	for i < len(sql) {
+		ch, width := utf8.DecodeRuneInString(sql[i:])
 		if ch == '$' {
-			return sql[:i+1]
+			return sql[:i+width]
 		}
 		if !(unicode.IsLetter(ch) || unicode.IsDigit(ch) || ch == '_') {
 			return ""
 		}
+		i += width
 	}
 	return ""
 }
@@ -775,7 +967,7 @@ func defaultRoleForStmt(t StmtType) RelationRole {
 	switch t {
 	case StmtTypeSelect, StmtTypeCopy:
 		return RelationRead
-	case StmtTypeGrant, StmtTypeAlterDefaultPrivileges:
+	case StmtTypeGrant, StmtTypeRevoke, StmtTypeAlterDefaultPrivileges:
 		return RelationTarget
 	default:
 		return RelationWrite

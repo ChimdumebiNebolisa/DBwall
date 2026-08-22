@@ -10,7 +10,7 @@ import (
 
 // Parse validates SQL with the structured PostgreSQL AST and derives semantic metadata.
 func Parse(sql string) ([]Statement, error) {
-	segments, err := splitSQLStatementsWithLines(sql)
+	segments, err := splitSQLStatementsWithLines(stripUTF8BOM(sql))
 	if err != nil {
 		return nil, err
 	}
