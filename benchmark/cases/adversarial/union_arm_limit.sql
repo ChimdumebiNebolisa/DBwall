@@ -1,0 +1,1 @@
+(SELECT * FROM logs LIMIT 1) UNION ALL (SELECT * FROM users);

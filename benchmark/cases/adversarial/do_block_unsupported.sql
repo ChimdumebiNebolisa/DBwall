@@ -1,0 +1,1 @@
+DO $$ BEGIN EXECUTE 'DELETE FROM users'; END $$;
