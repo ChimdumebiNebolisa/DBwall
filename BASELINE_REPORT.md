@@ -1,5 +1,10 @@
 # dbguard – Baseline Investigation Report
 
+> **Historical document (v0.1 era, preserved for provenance).** The architecture
+> described below (ParseToJSON-based parser, five v1 rules, docs/ folder) has been
+> replaced by the current AST-based dual-mode implementation. Do not use this file
+> to understand current behavior; see README.md and audit/ADVERSARIAL_AUDIT_REPORT.md.
+
 **Date:** (investigation run)  
 **Branch:** main  
 **Remote:** origin → https://github.com/ChimdumebiNebolisa/DBwall.git  

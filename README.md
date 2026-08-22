@@ -41,18 +41,26 @@ Exit codes:
 
 DBwall reports its parser coverage mode explicitly:
 
-- `full` (`CGO_ENABLED=1`): security metadata is derived by walking the structured PostgreSQL AST from `pg_query_go` (relations, grants, predicates, nested CTE/subquery sources). JSON/SARIF also expose per-statement `completeness`.
-- `core` (`CGO_ENABLED=0`): portable token parser with explicitly reduced semantic coverage. Multi-table joins, nested CTE mutations, and several GRANT/DROP multi-object shapes are only accurate in `full` mode.
+- `full` (`CGO_ENABLED=1`): security metadata is derived by walking the structured PostgreSQL AST from `pg_query_go` (relations, grants/revokes, predicates, nested CTE/subquery sources). JSON/SARIF also expose per-statement `completeness`.
+- `core` (`CGO_ENABLED=0`): portable token parser with explicitly reduced semantic coverage. Joins, `UPDATE ... FROM` / `DELETE ... USING` secondary relations, and CTE/subquery sources are only accurate in `full` mode.
 
 Checks that need `full` mode for accurate relation discovery include:
 
 - join / `UPDATE ... FROM` / `DELETE ... USING` secondary relations
-- CTE and subquery sources (including `COPY (SELECT ...)`)
-- multi-object `DROP TABLE` / `TRUNCATE` / `GRANT ... ON TABLE a, b`
+- CTE and subquery sources (including `COPY (SELECT ...)` inner shapes)
 - constant-folded trivial predicates beyond `TRUE` and `1 = 1`
-- explicit `semantic_analysis_incomplete` findings for unsupported AST statement types
+
+Both modes handle, at parity: multi-object `DROP TABLE` / `TRUNCATE` / `GRANT ... ON TABLE a, b`, top-level `LIMIT` / `FETCH FIRST n ROWS` bounding, subquery-safe `WHERE` detection (a `WHERE` inside a `SET` subquery does not bound an outer mutation), REVOKE recognition, UTF-8 BOM input, non-ASCII identifiers, and unsupported statement families (they emit the `semantic_analysis_incomplete` rule instead of silently allowing).
+
+Statements that are recognized as unsupported in both modes — for example `DO` blocks, `CREATE FUNCTION` (including `SECURITY DEFINER` bodies), `SET ROLE`, `SET SESSION AUTHORIZATION`, `CREATE EXTENSION`, transaction wrappers in full mode — produce a `warn`-level `semantic_analysis_incomplete` finding by default. They are never silently allowed unless you explicitly set that rule to `allow` in your policy.
 
 Portable release archives are built with `CGO_ENABLED=0` (`core` mode). Tagged releases also publish a Linux amd64 **full-mode** archive (`dbguard_<tag>_linux_amd64_full.tar.gz`, `CGO_ENABLED=1`) for first-party PR gates.
+
+### Known exclusions
+
+- `INSERT INTO t SELECT * FROM protected_table` records the read relation but no bulk-access rule consumes it yet; staging-table copies of protected data are not flagged. Treat this as an explicit exclusion, not a guarantee.
+- Predicate analysis is syntactic constant folding. Column-vs-column tautologies such as `WHERE id = id` are treated as non-trivial; DBwall does not claim to prove row-level safety.
+- Revocations (`REVOKE`) are recognized and allowed; no rule reviews revoke scope today.
 
 ## Install
 
@@ -203,33 +211,42 @@ DBwall includes an adversarial corpus under [test_e2e/testdata/corpus.json](test
 
 The reproducible benchmark harness lives under `benchmark/`.
 
-Run it from the repo root:
+Run it from the repo root (full mode):
 
 ```bash
 CGO_ENABLED=1 go run ./benchmark/cmd/dbwallbench --repo-root . --manifest ./benchmark/manifest.json --json-out ./benchmark/results/benchmark_results.json --report-out ./benchmark/reports/benchmark_report.md
 ```
 
+Core-mode run (same manifest, portable build):
+
+```bash
+CGO_ENABLED=0 go run ./benchmark/cmd/dbwallbench --repo-root . --manifest ./benchmark/manifest.json --json-out ./benchmark/results/benchmark_results_core.json --report-out ./benchmark/reports/benchmark_report_core.md
+```
+
 Saved artifacts:
 
-- Raw benchmark results: [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json)
-- Human-readable report: [benchmark/reports/benchmark_report.md](benchmark/reports/benchmark_report.md)
+- Full-mode raw results: [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json)
+- Full-mode report: [benchmark/reports/benchmark_report.md](benchmark/reports/benchmark_report.md)
+- Core-mode raw results: [benchmark/results/benchmark_results_core.json](benchmark/results/benchmark_results_core.json)
+- Core-mode report: [benchmark/reports/benchmark_report_core.md](benchmark/reports/benchmark_report_core.md)
 
-Current saved run from [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json):
+Current saved full-mode run from [benchmark/results/benchmark_results.json](benchmark/results/benchmark_results.json):
 
 - Corpus: `benchmark/manifest.json`
 - Coverage mode: `full`
-- Total cases: `29`
-- Correct blocks: `13`
-- Correct allows: `6`
-- Correct warns: `10`
+- Total cases: `41`
+- Correct blocks: `17`
+- Correct allows: `9`
+- Correct warns: `15`
 - False positives: `0`
 - False negatives: `0`
 - Precision (`block` as positive class): `1.0000`
 - Recall (`block` as positive class): `1.0000`
 - Accuracy (exact decision match): `1.0000`
-- Average runtime per case: `4.157 ms`
 
-Those numbers are measured results from the saved artifact, not a generalized product claim. Precision and recall use `block` as the positive class. Cases marked `requires_full` are included only when the built binary reports `coverage_mode=full`.
+Current saved core-mode run from [benchmark/results/benchmark_results_core.json](benchmark/results/benchmark_results_core.json): 26 cases (the 15 cases marked `requires_full` are skipped), accuracy `1.0000`, precision/recall (`block`) `1.0000`, false positives `0`, false negatives `0`.
+
+Those numbers are measured results from the saved artifacts, not a generalized product claim. Precision and recall use `block` as the positive class. Cases marked `requires_full` are included only when the built binary reports `coverage_mode=full`. A perfect score on this corpus means the corpus matches current behavior; it is not evidence of universal correctness.
 
 ## Local Development
 
@@ -238,6 +255,16 @@ CGO_ENABLED=1 go test ./...
 CGO_ENABLED=0 go test ./...
 go vet ./...
 ```
+
+`CGO_ENABLED=1` requires a C compiler. On Windows the msys2 mingw64 `gcc` works when its `bin` directory is on `PATH`. Fuzz targets live in `internal/parser` (`FuzzParse`); run for a bounded budget with, for example:
+
+```bash
+CGO_ENABLED=0 go test -fuzz=FuzzParse -fuzztime=30s ./internal/parser
+```
+
+## Audit
+
+`audit/ADVERSARIAL_AUDIT_REPORT.md` documents an adversarial security audit (verified findings, rejected hypotheses, residual risks) and `audit/CORE_FULL_CAPABILITY_MATRIX.md` tracks per-family core/full capability parity.
 
 ## License
 
