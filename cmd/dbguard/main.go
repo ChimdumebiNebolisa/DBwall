@@ -9,6 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var validFormats = map[string]bool{"human": true, "json": true, "sarif": true}
+
+func validateFormat(format string) error {
+	if !validFormats[format] {
+		return fmt.Errorf("invalid --format %q: must be human, json, or sarif", format)
+	}
+	return nil
+}
+
 func main() {
 	root := &cobra.Command{
 		Use:   "dbguard",
@@ -34,6 +43,9 @@ func reviewSQLCmd() *cobra.Command {
 		Long:  `Parse and analyze the given SQL string. Use --policy to load a YAML policy file.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := validateFormat(format); err != nil {
+				return err
+			}
 			code := cli.ReviewSQL(args[0], policyPath, format)
 			os.Exit(code)
 			return nil
@@ -52,6 +64,9 @@ func reviewFileCmd() *cobra.Command {
 		Long:  `Parse and analyze SQL from a file. Use --policy to load a YAML policy file.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := validateFormat(format); err != nil {
+				return err
+			}
 			code := cli.ReviewFile(args[0], policyPath, format)
 			os.Exit(code)
 			return nil
@@ -72,6 +87,9 @@ allow/warn/block decision (strictest wins). Empty path lists report allow.
 Use --policy to load a YAML policy file.`,
 		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := validateFormat(format); err != nil {
+				return err
+			}
 			code := cli.ReviewFiles(args, policyPath, format)
 			os.Exit(code)
 			return nil
