@@ -1,7 +1,6 @@
 package test_e2e
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -94,7 +93,7 @@ func TestPortableBinaryAdversarial(t *testing.T) {
 		requireExit(t, bin, dir, []string{"review-sql", "DELETE FROM users;"}, 3, "Decision: BLOCK")
 		requireExit(t, bin, dir, []string{"review-sql", "ALTER ROLE app WITH SUPERUSER;"}, 2, "Decision: WARN")
 		requireExit(t, bin, dir, []string{"review-sql", "SELECT 1;", "--format", "bogus"}, 1, "invalid --format")
-		requireExit(t, bin, dir, []string{"review-sql", "SELECT 1;", "--policy", "..\\..\\x.yaml"}, 1, "outside the working directory")
+		requireExit(t, bin, dir, []string{"review-sql", "SELECT 1;", "--policy", "../../x.yaml"}, 1, "outside the working directory")
 	})
 
 	t.Run("CRLF file parses and blocks", func(t *testing.T) {
@@ -166,16 +165,7 @@ func TestPortableBinaryEmptyInputSarifContract(t *testing.T) {
 		t.Fatalf("empty-run SARIF invalid: %v", err)
 	}
 	run := decoded["runs"].([]any)[0].(map[string]any)
-	results := run["results"]
-	resultsList, ok := results.([]any)
-	if !ok || resultsList != nil && len(resultsList) != 0 {
-		if resultsList == nil {
-			t.Fatal("empty run must emit results:[] not null")
-		} else if len(resultsList) != 0 {
-			t.Fatalf("expected zero results, got %d", len(resultsList))
-		}
-	}
-	if !bytes.Contains([]byte(out), []byte(`"results": []`)) && len(results.([]any)) != 0 {
-		t.Fatal("results must serialize as an explicit empty array")
+	if results, ok := run["results"].([]any); !ok || len(results) != 0 {
+		t.Fatalf("empty run must emit an explicit empty results array, got: %s", out)
 	}
 }
