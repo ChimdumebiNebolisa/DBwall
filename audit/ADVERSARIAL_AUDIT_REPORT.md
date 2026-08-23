@@ -193,3 +193,14 @@ All P1 and selected P2 findings were fixed in this change set, each with regress
 Benchmark artifacts regenerated from scratch after fixes: full mode 41/41 exact (17 block / 9 allow / 15 warn), core mode 26/26 exact on its subset; zero FP/FN in both. Artifacts: `benchmark/results/benchmark_results{,_core}.json`, `benchmark/reports/benchmark_report{,_core}.md`. README numbers updated exclusively from these artifacts.
 
 Remaining open items (documented, not blocking): F-012 transaction-wrapper hard errors in core (fail-closed), F-015 warn-only treatment of unsupported families (design boundary), F-016 CI supply-chain hardening recommendations (SHA-pinning actions requires online verification), F-014 rule-surface decision deferred to maintainers, symlink-based policy escape (defense-in-depth).
+
+## 12. Post-Audit Addendum (hardening follow-up)
+
+Follow-up work closed the remaining accepted gaps that had concrete remediations:
+
+- **F-014 resolved**: new rule `insert_select_from_protected_table` (bulk_access, default warn) consumes the read relations recorded for `INSERT ... SELECT`. Core mode now captures simple and comma-separated INSERT..SELECT sources at parity; joins/subqueries/VALUES-scalar sources remain full-mode coverage and are documented. Benchmark case `warn_insert_select_read_source` pins it in both modes.
+- **F-016 partially resolved**: action.yml checksum selection replaced with exact-name awk matching plus 64-hex validation (no unescaped regex against version strings). `scripts/test_action_checksum_match.sh` verifies selection offline; wired into CI.
+- **Release verification**: `scripts/release_smoke.sh` mirrors release.yml's portable builds, verifies checksum round-trip, archive structure, zip extraction, and live binary behavior (`version`, `coverage_mode=core`, block exit 3); CI runs it as a `release-smoke` job. Linux full-mode cross-compilation remains GitHub-runner-only (verified structurally via `DBWALL_SMOKE_FULL_BIN` packaging path).
+- **Installed-artifact testing**: `test_e2e/portable_binary_test.go` force-builds the exact `CGO_ENABLED=0` artifact users install and adversarially exercises its CLI contract: exit codes 0/1/2/3, CRLF files, NUL bytes (fail-closed), 100k-token predicates, 20k-statement files, deep nesting, spaced filenames through multi-file SARIF, empty-run SARIF contract, and the new staging-copy warn.
+
+Residual exclusions are now exactly those listed in README "Known exclusions".

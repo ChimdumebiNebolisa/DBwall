@@ -50,7 +50,7 @@ Checks that need `full` mode for accurate relation discovery include:
 - CTE and subquery sources (including `COPY (SELECT ...)` inner shapes)
 - constant-folded trivial predicates beyond `TRUE` and `1 = 1`
 
-Both modes handle, at parity: multi-object `DROP TABLE` / `TRUNCATE` / `GRANT ... ON TABLE a, b`, top-level `LIMIT` / `FETCH FIRST n ROWS` bounding, subquery-safe `WHERE` detection (a `WHERE` inside a `SET` subquery does not bound an outer mutation), REVOKE recognition, UTF-8 BOM input, non-ASCII identifiers, and unsupported statement families (they emit the `semantic_analysis_incomplete` rule instead of silently allowing).
+Both modes handle, at parity: multi-object `DROP TABLE` / `TRUNCATE` / `GRANT ... ON TABLE a, b`, top-level `LIMIT` / `FETCH FIRST n ROWS` bounding, subquery-safe `WHERE` detection (a `WHERE` inside a `SET` subquery does not bound an outer mutation), `INSERT INTO ... SELECT` source relations for simple/comma-separated sources, REVOKE recognition, UTF-8 BOM input, non-ASCII identifiers, and unsupported statement families (they emit the `semantic_analysis_incomplete` rule instead of silently allowing).
 
 Statements that are recognized as unsupported in both modes — for example `DO` blocks, `CREATE FUNCTION` (including `SECURITY DEFINER` bodies), `SET ROLE`, `SET SESSION AUTHORIZATION`, `CREATE EXTENSION`, transaction wrappers in full mode — produce a `warn`-level `semantic_analysis_incomplete` finding by default. They are never silently allowed unless you explicitly set that rule to `allow` in your policy.
 
@@ -58,9 +58,19 @@ Portable release archives are built with `CGO_ENABLED=0` (`core` mode). Tagged r
 
 ### Known exclusions
 
-- `INSERT INTO t SELECT * FROM protected_table` records the read relation but no bulk-access rule consumes it yet; staging-table copies of protected data are not flagged. Treat this as an explicit exclusion, not a guarantee.
 - Predicate analysis is syntactic constant folding. Column-vs-column tautologies such as `WHERE id = id` are treated as non-trivial; DBwall does not claim to prove row-level safety.
 - Revocations (`REVOKE`) are recognized and allowed; no rule reviews revoke scope today.
+- `INSERT INTO ... SELECT` source coverage in core mode captures simple and comma-separated sources; joins, subqueries, and `VALUES ((SELECT ...))` sources require full mode.
+- In full mode the same staging-copy check (`insert_select_from_protected_table`) sees all AST-derived read relations; in core mode it is bounded by the token parser's documented FROM handling.
+
+## Release Artifacts
+
+Release archives are produced by [.github/workflows/release.yml](.github/workflows/release.yml):
+
+- Portable archives (core mode, `CGO_ENABLED=0`): Linux amd64, macOS amd64/arm64 tarballs, Windows amd64 zip. These contain `dbguard` + README + LICENSE and report `coverage_mode=core`.
+- Full-mode archive: `dbguard_<tag>_linux_amd64_full.tar.gz` with a `COVERAGE_MODE.txt` marker, built on GitHub's Ubuntu runners where a C toolchain is available. The release workflow verifies this artifact reports `coverage_mode=full` before publishing.
+
+`scripts/release_smoke.sh` mirrors the portable build steps locally/CI-side: it builds every portable archive, round-trips `checksums.txt`, checks archive structure, extracts the Windows zip, and runs the produced binary (version output, `coverage_mode=core`, block decision). CI runs it in the `release-smoke` job on every push/PR to main. The optional `DBWALL_SMOKE_FULL_BIN` variable packages any native full-mode binary into the full-archive shape for structural verification on hosts without a Linux C cross-toolchain.
 
 ## Install
 
@@ -181,6 +191,7 @@ rules:
   truncate_table: block
   writes_to_protected_tables: warn
   select_without_limit_from_protected_table: warn
+  insert_select_from_protected_table: warn
 ```
 
 Full example: [examples/dbguard.yaml](examples/dbguard.yaml)
@@ -234,17 +245,17 @@ Current saved full-mode run from [benchmark/results/benchmark_results.json](benc
 
 - Corpus: `benchmark/manifest.json`
 - Coverage mode: `full`
-- Total cases: `41`
+- Total cases: `42`
 - Correct blocks: `17`
 - Correct allows: `9`
-- Correct warns: `15`
+- Correct warns: `16`
 - False positives: `0`
 - False negatives: `0`
 - Precision (`block` as positive class): `1.0000`
 - Recall (`block` as positive class): `1.0000`
 - Accuracy (exact decision match): `1.0000`
 
-Current saved core-mode run from [benchmark/results/benchmark_results_core.json](benchmark/results/benchmark_results_core.json): 26 cases (the 15 cases marked `requires_full` are skipped), accuracy `1.0000`, precision/recall (`block`) `1.0000`, false positives `0`, false negatives `0`.
+Current saved core-mode run from [benchmark/results/benchmark_results_core.json](benchmark/results/benchmark_results_core.json): 27 cases (the 15 cases marked `requires_full` are skipped), accuracy `1.0000`, precision/recall (`block`) `1.0000`, false positives `0`, false negatives `0`.
 
 Those numbers are measured results from the saved artifacts, not a generalized product claim. Precision and recall use `block` as the positive class. Cases marked `requires_full` are included only when the built binary reports `coverage_mode=full`. A perfect score on this corpus means the corpus matches current behavior; it is not evidence of universal correctness.
 

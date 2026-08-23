@@ -35,7 +35,7 @@ Legend: ✅ accurate · ⚠️ partial/conservative (documented direction) · �
 | 28 | Comments between tokens / multiline / dollar quotes | ✅ | ✅ | ✅ | ✅ |
 | 29 | Unsupported families (DO, CREATE FUNCTION/VIEW/TABLE/POLICY/EXTENSION, SET ROLE, SET SESSION AUTHORIZATION, VACUUM, COMMENT, PREPARE/EXECUTE, REFRESH MV) | mixed: some parse-error, ALTER-family silent allow (F-005) | ⚠️ warn `semantic_analysis_incomplete`; never escalates for OTHER (F-015) | ⚠️ consistent warn post-fix | ⚠️ unchanged (design boundary documented) |
 | 30 | BEGIN/COMMIT/SAVEPOINT wrappers | ❌ exit 1 (fail-closed, F-012) | ⚠️ unsupported warns per statement | ⚠️ unchanged | ⚠️ unchanged |
-| 31 | INSERT .. SELECT read-source protection | ❌ source not captured; no consumer anyway | ⚠️ source captured but no rule consumes it (F-014 documented exclusion) | ⚠️ unchanged (documented exclusion) | ⚠️ unchanged |
+| 31 | INSERT .. SELECT read-source protection | ✅ simple + comma-separated sources captured; `insert_select_from_protected_table` warns (post-audit addendum) | ✅ AST-derived sources | ✅ | ✅ |
 | 32 | Per-statement completeness metadata + `coverage_mode` signaling | ✅ JSON/human/SARIF | ✅ | ✅ core reasons now actionable where meaningful (F-005) | ✅ |
 
 ## Standing limitations (intentional, documented)
