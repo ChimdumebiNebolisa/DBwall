@@ -58,6 +58,7 @@ func checkOne(stmt parser.Statement, p *policy.Policy) []Finding {
 	out = append(out, checkGrantToPublicOnProtectedObjects(stmt, p)...)
 	out = append(out, checkSelectAllFromProtectedTable(stmt, p)...)
 	out = append(out, checkSelectWithoutLimitFromProtectedTable(stmt, p)...)
+	out = append(out, checkInsertSelectFromProtectedTable(stmt, p)...)
 	out = append(out, checkCopyToStdoutOrProgramFromProtectedSource(stmt, p)...)
 	out = append(out, checkWritesToProtectedTables(stmt, p)...)
 	add(checkSemanticAnalysisIncomplete(stmt, p))
@@ -246,6 +247,25 @@ func checkSelectWithoutLimitFromProtectedTable(stmt parser.Statement, p *policy.
 	out := make([]Finding, 0, len(names))
 	for _, name := range names {
 		out = append(out, *newFinding(policy.RuleSelectWithoutLimitProtected, decision, "SELECT reads from a protected table without a LIMIT: "+name))
+	}
+	return out
+}
+
+// checkInsertSelectFromProtectedTable closes the staging-copy exclusion from
+// the adversarial audit: INSERT INTO t SELECT * FROM protected previously
+// recorded the read relation but no bulk-access rule consumed it.
+func checkInsertSelectFromProtectedTable(stmt parser.Statement, p *policy.Policy) []Finding {
+	if stmt.Type != parser.StmtTypeInsert {
+		return nil
+	}
+	names := protectedReadNames(stmt, p)
+	if len(names) == 0 {
+		return nil
+	}
+	decision := p.RuleDecision(policy.RuleInsertSelectFromProtected)
+	out := make([]Finding, 0, len(names))
+	for _, name := range names {
+		out = append(out, *newFinding(policy.RuleInsertSelectFromProtected, decision, "INSERT INTO ... SELECT copies protected rows into another table: "+name))
 	}
 	return out
 }

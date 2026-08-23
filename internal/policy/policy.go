@@ -42,6 +42,7 @@ const (
 	RuleGrantHighRiskRoleMembership = rulemeta.RuleGrantHighRiskRoleMembership
 	RuleSelectAllProtectedTable     = rulemeta.RuleSelectAllProtectedTable
 	RuleSelectWithoutLimitProtected = rulemeta.RuleSelectWithoutLimitProtected
+	RuleInsertSelectFromProtected   = rulemeta.RuleInsertSelectFromProtected
 	RuleCopyToStdoutOrProgram       = rulemeta.RuleCopyToStdoutOrProgram
 	RuleSemanticAnalysisIncomplete  = rulemeta.RuleSemanticAnalysisIncomplete
 )
