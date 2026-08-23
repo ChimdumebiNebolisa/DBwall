@@ -399,13 +399,44 @@ func parseInsertTokens(tokens []string, stmt Statement) (Statement, error) {
 	if tokenIs(tokens, pos, "INTO") {
 		pos++
 	}
-	table, _, err := parseQualifiedIdentifier(tokens, pos)
+	table, next, err := parseQualifiedIdentifier(tokens, pos)
 	if err != nil {
 		return Statement{}, err
 	}
 	stmt.Type = StmtTypeInsert
 	setRelation(&stmt, table)
+	captureInsertSelectSources(tokens, next, &stmt)
 	return stmt, nil
+}
+
+// captureInsertSelectSources records read relations feeding INSERT ... SELECT.
+// The full AST path already merges these; without this the portable parser
+// silently missed staging copies of protected tables (audit exclusion F-014).
+// As with other core FROM handling only comma-separated plain sources are
+// captured; joins and subqueries remain documented full-mode coverage.
+func captureInsertSelectSources(tokens []string, start int, stmt *Statement) {
+	selIdx := indexKeywordTopLevelFrom(tokens, start, "SELECT")
+	if selIdx < 0 {
+		return
+	}
+	fromIdx := indexKeywordTopLevelFrom(tokens, selIdx+1, "FROM")
+	if fromIdx < 0 || fromIdx+1 >= len(tokens) {
+		return
+	}
+	pos := fromIdx + 1
+	for pos < len(tokens) {
+		name, next, err := parseQualifiedIdentifier(tokens, pos)
+		if err != nil {
+			return
+		}
+		addRelationQualified(stmt, name, RelationRead)
+		pos = next
+		if pos < len(tokens) && tokens[pos] == "," {
+			pos++
+			continue
+		}
+		return
+	}
 }
 
 func parseTruncateTokens(tokens []string, stmt Statement) (Statement, error) {

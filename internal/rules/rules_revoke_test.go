@@ -39,3 +39,38 @@ func TestCheck_UnsupportedCoreStatementFiresIncomplete(t *testing.T) {
 	findings := Check(stmt, policy.DefaultPolicy())
 	requireRuleDecision(t, findings, policy.RuleSemanticAnalysisIncomplete, policy.DecisionWarn)
 }
+
+// Staging-copy exclusion closed: INSERT ... SELECT from a protected source warns.
+func TestCheck_InsertSelectFromProtectedWarns(t *testing.T) {
+	p := policy.DefaultPolicy()
+	p.ProtectedTables = []string{"users"}
+	stmt := parser.Statement{
+		Type: parser.StmtTypeInsert,
+		Relations: []parser.RelationRef{
+			{Name: "archive", Role: parser.RelationWrite},
+			{Name: "users", Role: parser.RelationRead},
+		},
+	}
+	findings := Check(stmt, p)
+	requireRuleDecision(t, findings, policy.RuleInsertSelectFromProtected, policy.DecisionWarn)
+
+	// Unprotected source stays silent.
+	p2 := policy.DefaultPolicy()
+	p2.ProtectedTables = []string{"payments"}
+	if findings := Check(stmt, p2); len(findings) != 0 {
+		t.Fatalf("unprotected INSERT..SELECT must not fire: %#v", findings)
+	}
+
+	// Plain VALUES insert has no read source and never fires.
+	valuesStmt := parser.Statement{
+		Type: parser.StmtTypeInsert,
+		Relations: []parser.RelationRef{
+			{Name: "users", Role: parser.RelationWrite},
+		},
+	}
+	for _, f := range Check(valuesStmt, p) {
+		if f.Rule == policy.RuleInsertSelectFromProtected {
+			t.Fatalf("write-only INSERT must not fire read rule: %#v", f)
+		}
+	}
+}

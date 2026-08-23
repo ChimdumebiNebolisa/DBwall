@@ -1,16 +1,16 @@
 {
   "repo_root": "C:\\Users\\Chimdumebi\\DBwall",
   "manifest_path": "C:\\Users\\Chimdumebi\\DBwall\\benchmark\\manifest.json",
-  "binary_path": "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-4283360223\\dbguard-bench.exe",
+  "binary_path": "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-618718926\\dbguard-bench.exe",
   "build_command": [
     "go",
     "build",
     "-o",
-    "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-4283360223\\dbguard-bench.exe",
+    "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-618718926\\dbguard-bench.exe",
     "./cmd/dbguard"
   ],
   "warmup_command": [
-    "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-4283360223\\dbguard-bench.exe",
+    "C:\\Users\\CHIMDU~1\\AppData\\Local\\Temp\\dbwall-benchmark-618718926\\dbguard-bench.exe",
     "version"
   ],
   "coverage_mode": "full",
@@ -25,15 +25,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 164943200,
+      "runtime_nanos": 253944200,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/benign/comment_only.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:07Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 0,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": []\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:52Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 0,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": []\n}\n",
       "stderr": ""
     },
     {
@@ -46,15 +46,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 378922600,
+      "runtime_nanos": 283399700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/dollar_quoted.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:07Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\dollar_quoted.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:52Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\dollar_quoted.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -67,15 +67,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 244833600,
+      "runtime_nanos": 271415000,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/exists_predicate.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:07Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\exists_predicate.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:53Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\exists_predicate.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -88,15 +88,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 326063800,
+      "runtime_nanos": 264703400,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/keyword_ident.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"select\",\n      \"object\": \"select\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\keyword_ident.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:53Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"select\",\n      \"object\": \"select\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\keyword_ident.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -110,9 +110,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 202392200,
+      "runtime_nanos": 257137600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/revoke_all_protected.sql",
         "--format",
@@ -120,7 +120,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"REVOKE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\revoke_all_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:53Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"REVOKE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\revoke_all_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -133,15 +133,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 150218200,
+      "runtime_nanos": 253237600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/revoke_role_highrisk.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"REVOKE\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\revoke_role_highrisk.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:53Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"REVOKE\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\revoke_role_highrisk.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -154,15 +154,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 202175700,
+      "runtime_nanos": 267971000,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/benign/safe_insert.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"INSERT\",\n      \"table\": \"audit_events\",\n      \"object\": \"audit_events\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\safe_insert.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:54Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"INSERT\",\n      \"table\": \"audit_events\",\n      \"object\": \"audit_events\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\safe_insert.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -175,15 +175,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 175806600,
+      "runtime_nanos": 276581100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/benign/scoped_update.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\scoped_update.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:54Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\scoped_update.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -196,15 +196,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 0,
-      "runtime_nanos": 158432500,
+      "runtime_nanos": 300481100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/benign/select_constant.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\select_constant.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:54Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"allow\",\n  \"severity\": \"low\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 0,\n    \"blocks\": 0,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\benign\\\\select_constant.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": []\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -217,15 +217,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 216571600,
+      "runtime_nanos": 373797100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/begin_commit_block.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 3,\n    \"findings\": 3,\n    \"blocks\": 1,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    },\n    {\n      \"index\": 2,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 2\n        }\n      ]\n    },\n    {\n      \"index\": 3,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 3\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:55Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 3,\n    \"findings\": 3,\n    \"blocks\": 1,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    },\n    {\n      \"index\": 2,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 2\n        }\n      ]\n    },\n    {\n      \"index\": 3,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\begin_commit_block.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 3\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -238,15 +238,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 216865600,
+      "runtime_nanos": 343563600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/bom_delete.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"logs\",\n      \"object\": \"logs\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\bom_delete.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:55Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"logs\",\n      \"object\": \"logs\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\bom_delete.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -260,9 +260,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 269122700,
+      "runtime_nanos": 315700400,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/copy_select_stdout.sql",
         "--format",
@@ -270,7 +270,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"COPY\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\copy_select_stdout.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"copy_to_stdout_or_program_from_protected_source\",\n          \"title\": \"COPY to STDOUT or PROGRAM from protected source\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"COPY exports data from a protected source to STDOUT or PROGRAM: users\",\n          \"rationale\": \"COPY TO STDOUT or PROGRAM is a direct bulk-exfiltration path for protected data.\",\n          \"remediation\": \"Use a reviewed export workflow with explicit approval, destination, and audit trail.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:55Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"COPY\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\copy_select_stdout.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"copy_to_stdout_or_program_from_protected_source\",\n          \"title\": \"COPY to STDOUT or PROGRAM from protected source\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"COPY exports data from a protected source to STDOUT or PROGRAM: users\",\n          \"rationale\": \"COPY TO STDOUT or PROGRAM is a direct bulk-exfiltration path for protected data.\",\n          \"remediation\": \"Use a reviewed export workflow with explicit approval, destination, and audit trail.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -284,9 +284,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 253534100,
+      "runtime_nanos": 318857600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/copy_table_stdout.sql",
         "--format",
@@ -294,7 +294,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"COPY\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\copy_table_stdout.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"copy_to_stdout_or_program_from_protected_source\",\n          \"title\": \"COPY to STDOUT or PROGRAM from protected source\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"COPY exports data from a protected source to STDOUT or PROGRAM: users\",\n          \"rationale\": \"COPY TO STDOUT or PROGRAM is a direct bulk-exfiltration path for protected data.\",\n          \"remediation\": \"Use a reviewed export workflow with explicit approval, destination, and audit trail.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:56Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"COPY\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\copy_table_stdout.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"copy_to_stdout_or_program_from_protected_source\",\n          \"title\": \"COPY to STDOUT or PROGRAM from protected source\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"COPY exports data from a protected source to STDOUT or PROGRAM: users\",\n          \"rationale\": \"COPY TO STDOUT or PROGRAM is a direct bulk-exfiltration path for protected data.\",\n          \"remediation\": \"Use a reviewed export workflow with explicit approval, destination, and audit trail.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -307,15 +307,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 615314600,
+      "runtime_nanos": 355138700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/cte_delete.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:10Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\cte_delete.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:56Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\cte_delete.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -328,15 +328,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 184113500,
+      "runtime_nanos": 296162700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/default_privileges.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:10Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"ALTER_DEFAULT_PRIVILEGES\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\default_privileges.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"alter_default_privileges_public\",\n          \"title\": \"ALTER DEFAULT PRIVILEGES to PUBLIC\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"ALTER DEFAULT PRIVILEGES grants access to PUBLIC\",\n          \"rationale\": \"Broad default privileges create a persistent exposure for future objects.\",\n          \"remediation\": \"Default privileges should target explicit least-privilege roles rather than PUBLIC.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:56Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"ALTER_DEFAULT_PRIVILEGES\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\default_privileges.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"alter_default_privileges_public\",\n          \"title\": \"ALTER DEFAULT PRIVILEGES to PUBLIC\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"ALTER DEFAULT PRIVILEGES grants access to PUBLIC\",\n          \"rationale\": \"Broad default privileges create a persistent exposure for future objects.\",\n          \"remediation\": \"Default privileges should target explicit least-privilege roles rather than PUBLIC.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -349,15 +349,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 249342200,
+      "runtime_nanos": 282777300,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/delete_true_or.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:10Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\delete_true_or.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_trivial_where\",\n          \"title\": \"DELETE with trivial WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement uses a trivial WHERE predicate\",\n          \"rationale\": \"A trivial predicate such as WHERE TRUE behaves like an unbounded DELETE in practice.\",\n          \"remediation\": \"Replace the predicate with a selective filter tied to the intended records.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:57Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\delete_true_or.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_trivial_where\",\n          \"title\": \"DELETE with trivial WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement uses a trivial WHERE predicate\",\n          \"rationale\": \"A trivial predicate such as WHERE TRUE behaves like an unbounded DELETE in practice.\",\n          \"remediation\": \"Replace the predicate with a selective filter tied to the intended records.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -370,15 +370,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 192205900,
+      "runtime_nanos": 270993700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/delete_using.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\delete_using.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:57Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\delete_using.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -391,15 +391,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 170654200,
+      "runtime_nanos": 306746600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/dangerous/delete_without_where.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\delete_without_where.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:57Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\delete_without_where.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -413,9 +413,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 213609100,
+      "runtime_nanos": 313928200,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/drop_table_multi.sql",
         "--format",
@@ -423,7 +423,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 1,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DROP_TABLE\",\n      \"table\": \"a\",\n      \"object\": \"a\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\drop_table_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"drop_table\",\n          \"title\": \"DROP TABLE\",\n          \"category\": \"destructive_ddl\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DROP TABLE statement\",\n          \"rationale\": \"Dropping a table removes the relation definition and can cascade into data loss.\",\n          \"remediation\": \"Use a reviewed migration plan and verify the table is intentionally being retired.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:57Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 1,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DROP_TABLE\",\n      \"table\": \"a\",\n      \"object\": \"a\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\drop_table_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"drop_table\",\n          \"title\": \"DROP TABLE\",\n          \"category\": \"destructive_ddl\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DROP TABLE statement\",\n          \"rationale\": \"Dropping a table removes the relation definition and can cascade into data loss.\",\n          \"remediation\": \"Use a reviewed migration plan and verify the table is intentionally being retired.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -437,9 +437,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 240755400,
+      "runtime_nanos": 283402500,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/grant_multi.sql",
         "--format",
@@ -447,7 +447,7 @@
         "--policy",
         "benchmark/policies/grant_multi_protected.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\grant_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_to_public_on_protected_objects\",\n          \"title\": \"GRANT to PUBLIC on protected object\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT exposes a protected object to PUBLIC: users\",\n          \"rationale\": \"Granting access to PUBLIC broadens visibility to every role in the database.\",\n          \"remediation\": \"Grant only to explicit least-privilege roles and keep protected objects out of PUBLIC access.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:58Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\grant_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_to_public_on_protected_objects\",\n          \"title\": \"GRANT to PUBLIC on protected object\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT exposes a protected object to PUBLIC: users\",\n          \"rationale\": \"Granting access to PUBLIC broadens visibility to every role in the database.\",\n          \"remediation\": \"Grant only to explicit least-privilege roles and keep protected objects out of PUBLIC access.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -461,9 +461,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 169956300,
+      "runtime_nanos": 434108500,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/dangerous/grant_public_protected.sql",
         "--format",
@@ -471,7 +471,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\grant_public_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_to_public_on_protected_objects\",\n          \"title\": \"GRANT to PUBLIC on protected object\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT exposes a protected object to PUBLIC: users\",\n          \"rationale\": \"Granting access to PUBLIC broadens visibility to every role in the database.\",\n          \"remediation\": \"Grant only to explicit least-privilege roles and keep protected objects out of PUBLIC access.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:58Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\grant_public_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_to_public_on_protected_objects\",\n          \"title\": \"GRANT to PUBLIC on protected object\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT exposes a protected object to PUBLIC: users\",\n          \"rationale\": \"Granting access to PUBLIC broadens visibility to every role in the database.\",\n          \"remediation\": \"Grant only to explicit least-privilege roles and keep protected objects out of PUBLIC access.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -484,15 +484,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 184167400,
+      "runtime_nanos": 308570100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/role_grant.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:12Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\role_grant.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_high_risk_role_membership\",\n          \"title\": \"Grant high-risk role membership\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT assigns a high-risk role membership: pg_read_all_data\",\n          \"rationale\": \"Granting high-risk built-in or protected roles can expand privileged access sharply.\",\n          \"remediation\": \"Review role membership manually and prefer narrowly scoped application roles.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:59Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"high\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"GRANT\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\role_grant.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"grant_high_risk_role_membership\",\n          \"title\": \"Grant high-risk role membership\",\n          \"category\": \"permissions\",\n          \"severity\": \"high\",\n          \"decision\": \"block\",\n          \"message\": \"GRANT assigns a high-risk role membership: pg_read_all_data\",\n          \"rationale\": \"Granting high-risk built-in or protected roles can expand privileged access sharply.\",\n          \"remediation\": \"Review role membership manually and prefer narrowly scoped application roles.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -506,9 +506,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 267329900,
+      "runtime_nanos": 396636300,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/truncate_multi.sql",
         "--format",
@@ -516,7 +516,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:12Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 3,\n    \"blocks\": 1,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"TRUNCATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\truncate_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"truncate_table\",\n          \"title\": \"TRUNCATE TABLE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"TRUNCATE statement\",\n          \"rationale\": \"TRUNCATE removes all rows immediately and bypasses row-by-row safety checks.\",\n          \"remediation\": \"Use an explicit reviewed maintenance workflow before truncating data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:59Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 3,\n    \"blocks\": 1,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"TRUNCATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\truncate_multi.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"truncate_table\",\n          \"title\": \"TRUNCATE TABLE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"TRUNCATE statement\",\n          \"rationale\": \"TRUNCATE removes all rows immediately and bypasses row-by-row safety checks.\",\n          \"remediation\": \"Use an explicit reviewed maintenance workflow before truncating data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -529,15 +529,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 203579300,
+      "runtime_nanos": 326625700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/dangerous/truncate_table.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:12Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"TRUNCATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\truncate_table.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"truncate_table\",\n          \"title\": \"TRUNCATE TABLE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"TRUNCATE statement\",\n          \"rationale\": \"TRUNCATE removes all rows immediately and bypasses row-by-row safety checks.\",\n          \"remediation\": \"Use an explicit reviewed maintenance workflow before truncating data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:59Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"TRUNCATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\dangerous\\\\truncate_table.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"truncate_table\",\n          \"title\": \"TRUNCATE TABLE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"TRUNCATE statement\",\n          \"rationale\": \"TRUNCATE removes all rows immediately and bypasses row-by-row safety checks.\",\n          \"remediation\": \"Use an explicit reviewed maintenance workflow before truncating data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -550,15 +550,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 170150800,
+      "runtime_nanos": 269786100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/unicode_ident.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:12Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"café\",\n      \"object\": \"café\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\unicode_ident.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:28:59Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"DELETE\",\n      \"table\": \"café\",\n      \"object\": \"café\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\unicode_ident.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"delete_without_where\",\n          \"title\": \"DELETE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"DELETE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded DELETE can remove every row from the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or split the operation into a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -571,15 +571,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 3,
-      "runtime_nanos": 224113900,
+      "runtime_nanos": 378422600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/update_set_subquery_trivial_where.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:13Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"accounts\",\n      \"object\": \"accounts\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\update_set_subquery_trivial_where.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"update_without_where\",\n          \"title\": \"UPDATE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"UPDATE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded UPDATE can overwrite every row in the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or run the change through a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:00Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"block\",\n  \"severity\": \"critical\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 1,\n    \"warnings\": 0\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"accounts\",\n      \"object\": \"accounts\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\update_set_subquery_trivial_where.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"update_without_where\",\n          \"title\": \"UPDATE without WHERE\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"critical\",\n          \"decision\": \"block\",\n          \"message\": \"UPDATE statement has no WHERE clause\",\n          \"rationale\": \"An unbounded UPDATE can overwrite every row in the target relation.\",\n          \"remediation\": \"Add a selective WHERE clause or run the change through a reviewed migration.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -593,9 +593,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 192394700,
+      "runtime_nanos": 667843300,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/cte_protected.sql",
         "--format",
@@ -603,7 +603,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:13Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 0,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\cte_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:01Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 0,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\cte_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -617,9 +617,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 213477500,
+      "runtime_nanos": 887916200,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/join_protected.sql",
         "--format",
@@ -627,7 +627,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:13Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\join_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:01Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"orders\",\n      \"object\": \"orders\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\join_protected.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -641,9 +641,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 201321900,
+      "runtime_nanos": 513435200,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/nested_subquery.sql",
         "--format",
@@ -651,7 +651,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:13Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 3,\n    \"blocks\": 0,\n    \"warnings\": 3\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\nested_subquery.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: payments\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: payments\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:02Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 3,\n    \"blocks\": 0,\n    \"warnings\": 3\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\nested_subquery.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: payments\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: payments\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -665,9 +665,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 218187500,
+      "runtime_nanos": 829482900,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/borderline/protected_select_star_limit.sql",
         "--format",
@@ -675,7 +675,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:13Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_select_star_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:03Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_select_star_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -689,9 +689,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 215945600,
+      "runtime_nanos": 822285300,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/borderline/protected_select_without_limit.sql",
         "--format",
@@ -699,7 +699,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:14Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_select_without_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:04Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_select_without_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -713,9 +713,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 181843300,
+      "runtime_nanos": 2199545100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/borderline/protected_update.sql",
         "--format",
@@ -723,7 +723,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:14Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_update.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:06Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\borderline\\\\protected_update.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: users\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -737,9 +737,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 204843000,
+      "runtime_nanos": 661748200,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/schema_quoted.sql",
         "--format",
@@ -747,7 +747,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:14Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"public.Users\",\n      \"object\": \"public.Users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\schema_quoted.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: public.Users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:06Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"public.Users\",\n      \"object\": \"public.Users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\schema_quoted.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: public.Users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -760,15 +760,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 179118700,
+      "runtime_nanos": 428072700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/alter_role_superuser.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:14Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\alter_role_superuser.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:07Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\alter_role_superuser.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -781,15 +781,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 239966500,
+      "runtime_nanos": 501271100,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/do_block_unsupported.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:14Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\do_block_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:07Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\do_block_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -802,15 +802,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 358132900,
+      "runtime_nanos": 562840600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/drop_type_unsupported.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:15Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_drop_object_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\drop_type_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_drop_object_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_drop_object_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\drop_type_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_drop_object_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -824,9 +824,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 202531100,
+      "runtime_nanos": 409357900,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/fetch_first_bounded.sql",
         "--format",
@@ -834,7 +834,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:15Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\fetch_first_bounded.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:08Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"users\",\n      \"object\": \"users\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\fetch_first_bounded.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -848,9 +848,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 263123100,
+      "runtime_nanos": 468556600,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/insert_select.sql",
         "--format",
@@ -858,7 +858,31 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:15Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"INSERT\",\n      \"table\": \"payments\",\n      \"object\": \"payments\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\insert_select.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"INSERT\",\n      \"table\": \"payments\",\n      \"object\": \"payments\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\insert_select.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "id": "warn_insert_select_read_source",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/insert_select_read_source.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn",
+      "actual_decision": "warn",
+      "exact_match": true,
+      "false_positive": false,
+      "false_negative": false,
+      "exit_code": 2,
+      "runtime_nanos": 576139300,
+      "command": [
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
+        "review-file",
+        "benchmark/cases/adversarial/insert_select_read_source.sql",
+        "--format",
+        "json",
+        "--policy",
+        "benchmark/policies/protected_objects.yaml"
+      ],
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:09Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"INSERT\",\n      \"table\": \"archive\",\n      \"object\": \"archive\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\insert_select_read_source.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"insert_select_from_protected_table\",\n          \"title\": \"INSERT INTO ... SELECT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"INSERT INTO ... SELECT copies protected rows into another table: users\",\n          \"rationale\": \"Copying protected rows into a staging table is a bulk extraction pattern that can bypass per-row review.\",\n          \"remediation\": \"Restrict the SELECT with an explicit column list and predicate, or route the copy through a reviewed export workflow.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -872,9 +896,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 208118700,
+      "runtime_nanos": 303724900,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/union_arm_limit.sql",
         "--format",
@@ -882,7 +906,7 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:15Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 0,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"logs\",\n      \"object\": \"logs\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\union_arm_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:10Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 2,\n    \"blocks\": 0,\n    \"warnings\": 2\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"SELECT\",\n      \"table\": \"logs\",\n      \"object\": \"logs\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\union_arm_limit.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"select_all_from_protected_table\",\n          \"title\": \"SELECT * from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT * reads every column from a protected table: users\",\n          \"rationale\": \"Selecting every column from a protected relation increases accidental data exposure risk.\",\n          \"remediation\": \"Project only the required columns and document the access need for protected data.\",\n          \"statement_index\": 1\n        },\n        {\n          \"rule\": \"select_without_limit_from_protected_table\",\n          \"title\": \"SELECT without LIMIT from protected table\",\n          \"category\": \"bulk_access\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"SELECT reads from a protected table without a LIMIT: users\",\n          \"rationale\": \"Unbounded reads from protected relations look like bulk extraction and are harder to review safely.\",\n          \"remediation\": \"Add a LIMIT or another narrow predicate to make the read scope explicit.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -895,15 +919,15 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 223763800,
+      "runtime_nanos": 333262800,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/create_index_unsupported.sql",
         "--format",
         "json"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:16Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\create_index_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:10Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"OTHER\",\n      \"table\": \"\",\n      \"start_line\": 1,\n      \"completeness\": \"unsupported\",\n      \"incomplete_reasons\": [\n        \"unsupported_statement_type\"\n      ],\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\create_index_unsupported.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"semantic_analysis_incomplete\",\n          \"title\": \"Semantic analysis incomplete\",\n          \"category\": \"analysis_coverage\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Semantic analysis is unsupported: unsupported_statement_type\",\n          \"rationale\": \"When statement semantics are only partially understood, an allow decision would silently over-claim coverage.\",\n          \"remediation\": \"Review the statement manually, simplify unsupported constructs, or build DBwall in full mode for AST-backed analysis.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     },
     {
@@ -917,9 +941,9 @@
       "false_positive": false,
       "false_negative": false,
       "exit_code": 2,
-      "runtime_nanos": 191717100,
+      "runtime_nanos": 1018591700,
       "command": [
-        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-4283360223/dbguard-bench.exe",
+        "C:/Users/CHIMDU~1/AppData/Local/Temp/dbwall-benchmark-618718926/dbguard-bench.exe",
         "review-file",
         "benchmark/cases/adversarial/update_from.sql",
         "--format",
@@ -927,22 +951,22 @@
         "--policy",
         "benchmark/policies/protected_objects.yaml"
       ],
-      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-22T05:30:16Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"payments\",\n      \"object\": \"payments\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\update_from.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
+      "stdout": "{\n  \"tool\": \"dbguard\",\n  \"version\": \"0.2.0-dev\",\n  \"generated_at\": \"2026-08-23T00:29:11Z\",\n  \"coverage_mode\": \"full\",\n  \"decision\": \"warn\",\n  \"severity\": \"medium\",\n  \"summary\": {\n    \"statements\": 1,\n    \"findings\": 1,\n    \"blocks\": 0,\n    \"warnings\": 1\n  },\n  \"statements\": [\n    {\n      \"index\": 1,\n      \"type\": \"UPDATE\",\n      \"table\": \"payments\",\n      \"object\": \"payments\",\n      \"start_line\": 1,\n      \"completeness\": \"complete\",\n      \"location\": {\n        \"path\": \"C:\\\\Users\\\\Chimdumebi\\\\DBwall\\\\benchmark\\\\cases\\\\adversarial\\\\update_from.sql\",\n        \"start_line\": 1\n      },\n      \"findings\": [\n        {\n          \"rule\": \"writes_to_protected_tables\",\n          \"title\": \"Write to protected table\",\n          \"category\": \"destructive_dml\",\n          \"severity\": \"medium\",\n          \"decision\": \"warn\",\n          \"message\": \"Write to protected table: payments\",\n          \"rationale\": \"Protected relations hold high-value data and deserve an explicit review boundary.\",\n          \"remediation\": \"Confirm the target relation is intended and escalate to manual approval when needed.\",\n          \"statement_index\": 1\n        }\n      ]\n    }\n  ]\n}\n",
       "stderr": ""
     }
   ],
   "metrics": {
-    "total_cases": 41,
+    "total_cases": 42,
     "correct_blocks": 17,
     "correct_allows": 9,
-    "correct_warns": 15,
+    "correct_warns": 16,
     "false_positives": 0,
     "false_negatives": 0,
     "precision": 1,
     "recall": 1,
     "accuracy": 1,
-    "average_runtime_nanos": 227796592,
-    "average_runtime_ms": 227.796592
+    "average_runtime_nanos": 456861004,
+    "average_runtime_ms": 456.861004
   },
   "positive_decision": "block",
   "definitions": {

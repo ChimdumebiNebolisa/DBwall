@@ -255,6 +255,13 @@
       "requires_full": true
     },
     {
+      "id": "warn_insert_select_read_source",
+      "category": "dangerous",
+      "sql_file": "cases/adversarial/insert_select_read_source.sql",
+      "policy_file": "policies/protected_objects.yaml",
+      "expected_decision": "warn"
+    },
+    {
       "id": "block_cte_delete",
       "category": "dangerous",
       "sql_file": "cases/adversarial/cte_delete.sql",

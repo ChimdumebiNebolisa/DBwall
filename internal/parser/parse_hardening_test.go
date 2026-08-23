@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"sort"
 	"strings"
 	"testing"
 )
@@ -192,6 +193,49 @@ func TestParse_TrailingCommentAfterStatement(t *testing.T) {
 	}
 	if len(stmts) != 1 {
 		t.Fatalf("trailing comment created phantom statement: %d statements", len(stmts))
+	}
+}
+
+func TestParse_InsertSelectCapturesReadSource(t *testing.T) {
+	// Audit exclusion F-014: staging copies of protected tables must at least
+	// record their read source in both modes so bulk-access rules can fire.
+	cases := []struct {
+		sql  string
+		want []string
+	}{
+		{"INSERT INTO archive SELECT * FROM users;", []string{"users"}},
+		{"INSERT INTO archive (id, name) SELECT id, name FROM users;", []string{"users"}},
+		{"INSERT INTO archive SELECT * FROM users, sessions;", []string{"sessions", "users"}},
+	}
+	for _, tc := range cases {
+		stmts, err := Parse(tc.sql)
+		if err != nil {
+			t.Fatalf("%q: %v", tc.sql, err)
+		}
+		var reads []string
+		for _, rel := range stmts[0].ReadRelations() {
+			reads = append(reads, rel.QualifiedName())
+		}
+		sort.Strings(reads)
+		sort.Strings(tc.want)
+		if strings.Join(reads, ",") != strings.Join(tc.want, ",") {
+			t.Fatalf("%q: read relations want %v got %v", tc.sql, tc.want, reads)
+		}
+		if stmts[0].Table != "archive" {
+			t.Fatalf("%q: insert target changed: %q", tc.sql, stmts[0].Table)
+		}
+	}
+}
+
+func TestParse_InsertValuesSubqueryDoesNotFabricateSource(t *testing.T) {
+	stmts, err := Parse("INSERT INTO t VALUES ((SELECT max(x) FROM s));")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	for _, rel := range stmts[0].Relations {
+		if rel.Role == RelationRead {
+			t.Fatalf("VALUES-scalar subquery must not be claimed as core read source: %#v", stmts[0].Relations)
+		}
 	}
 }
 

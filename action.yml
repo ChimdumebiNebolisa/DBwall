@@ -106,17 +106,18 @@ runs:
           echo "checksums.txt missing or empty; refusing to use unverified binary" >&2
           exit 1
         fi
-        # Accept bare names or ./name entries from sha256sum.
-        if ! grep -E " ([.]/)?${ASSET}\$" checksums.txt > expected.sha256; then
+        # Exact-name selection (bare or ./ prefixed). awk avoids unescaped
+        # regex metacharacters in the version string.
+        expected_hash="$(awk -v asset="${ASSET}" '$2==asset || $2=="./"asset {print $1}' checksums.txt | head -n1)"
+        if [[ -z "${expected_hash}" ]]; then
           echo "no checksum entry for ${ASSET}; refusing to use unverified binary" >&2
           exit 1
         fi
-        if [[ ! -s expected.sha256 ]]; then
-          echo "checksum entry for ${ASSET} is empty; refusing to use unverified binary" >&2
+        if ! [[ "${expected_hash}" =~ ^[0-9a-fA-F]{64}$ ]]; then
+          echo "checksum entry for ${ASSET} is malformed; refusing to use unverified binary" >&2
           exit 1
         fi
-        # Normalize to the local downloaded basename for sha256sum -c.
-        awk -v asset="${ASSET}" '{print $1 "  " asset}' expected.sha256 > expected.normalized.sha256
+        printf '%s  %s\n' "${expected_hash}" "${ASSET}" > expected.normalized.sha256
         sha256sum -c expected.normalized.sha256
 
         tar -xzf "${ASSET}"

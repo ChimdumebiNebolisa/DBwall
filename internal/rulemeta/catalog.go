@@ -18,6 +18,7 @@ const (
 	RuleGrantHighRiskRoleMembership = "grant_high_risk_role_membership"
 	RuleSelectAllProtectedTable     = "select_all_from_protected_table"
 	RuleSelectWithoutLimitProtected = "select_without_limit_from_protected_table"
+	RuleInsertSelectFromProtected   = "insert_select_from_protected_table"
 	RuleCopyToStdoutOrProgram       = "copy_to_stdout_or_program_from_protected_source"
 	RuleSemanticAnalysisIncomplete  = "semantic_analysis_incomplete"
 )
@@ -177,6 +178,15 @@ var catalog = []Rule{
 		DefaultDecision: "warn",
 		Rationale:       "Unbounded reads from protected relations look like bulk extraction and are harder to review safely.",
 		Remediation:     "Add a LIMIT or another narrow predicate to make the read scope explicit.",
+	},
+	{
+		ID:              RuleInsertSelectFromProtected,
+		Title:           "INSERT INTO ... SELECT from protected table",
+		Category:        "bulk_access",
+		Severity:        "medium",
+		DefaultDecision: "warn",
+		Rationale:       "Copying protected rows into a staging table is a bulk extraction pattern that can bypass per-row review.",
+		Remediation:     "Restrict the SELECT with an explicit column list and predicate, or route the copy through a reviewed export workflow.",
 	},
 	{
 		ID:              RuleCopyToStdoutOrProgram,

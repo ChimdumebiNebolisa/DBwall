@@ -30,5 +30,6 @@ rules:
   grant_high_risk_role_membership: block
   select_all_from_protected_table: warn
   select_without_limit_from_protected_table: warn
+  insert_select_from_protected_table: warn
   copy_to_stdout_or_program_from_protected_source: block
   semantic_analysis_incomplete: warn
